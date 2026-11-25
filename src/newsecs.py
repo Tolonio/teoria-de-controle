@@ -245,3 +245,105 @@ PZ = {
  "Avanço de fase: 200": "O zero −10 <b>cancela</b> o polo −10, o que só é seguro porque esse polo é estável e conhecido. O polo novo em −50 é rápido. Os polos de MF dobram de distância à origem com o mesmo ângulo: mesmo ζ, 2× mais rápido. O ganho estático cai e o erro sobe (avanço não cuida de erro).",
  "PID para K/(s²+5s+4)": "Zero do PD em −7 dá +45° para levar o LGR a −4 ± j3. O zero do PI em −0,1 com o polo na origem forma um dipolo: erro zero, mas o polo de MF −0,085 faz a aproximação final ser lenta.",
 }
+
+CAPA_NOVA = r'''
+# ================= CAPA =================
+S += [Paragraph("Teoria de Controle – guia de estudo", ParagraphStyle("t", fontName="DVB", fontSize=24, leading=29, textColor=NAVY)),
+      Paragraph("Montado a partir das aulas, slides e listas (UFOP). Todas as contas foram conferidas numericamente. "
+                "No topo de cada página, a linha <i>Revise antes</i> mostra onde estão os conceitos que ela usa.",
+                ParagraphStyle("st", parent=body, fontSize=10.5, leading=14, textColor=colors.HexColor("#444"))),
+      Spacer(1, 6)]
+'''
+
+MALHA = r'''
+# ================= A malha aberta/fechada =================
+S += [H1("A. Malha aberta e malha fechada", "malha"),
+      P("Esta é a ideia que dá nome à disciplina. Um <b>sistema de controle</b> faz alguma grandeza física (a saída y: velocidade, temperatura, posição, nível) "
+        "seguir um valor desejado (a <b>referência</b> r), mesmo com perturbações. Existem dois jeitos de fazer isso."),
+      Paragraph("A.1 Malha aberta: o controle \"cego\"", h2),
+      P("O controlador calcula a ação <b>uma vez</b>, a partir da referência, e manda para o atuador. <b>Ninguém mede o resultado.</b> "
+        "Se algo mudar no caminho (carga, desgaste, temperatura ambiente), a saída erra e o controlador nem fica sabendo. Matematicamente, Y(s) = G(s)·R(s)."),
+      ]
+S += table([["Exemplo de malha aberta", "Como funciona", "O que dá errado"],
+            ["Torradeira de 2 minutos", "liga a resistência por um tempo fixo", "pão mais úmido ou mais grosso sai claro; pão fino queima"],
+            ["Máquina de lavar por timer", "cada etapa dura um tempo programado", "não sabe se a roupa está limpa"],
+            ["Semáforo de tempo fixo", "verde por 40 s, vermelho por 30 s", "não vê a fila de carros"],
+            ["Irrigação por timer", "liga a água 10 min por dia", "rega mesmo depois de chover"],
+            ["Motor CC ligado direto na tensão", "aplica a tensão que daria a velocidade desejada", "com carga, a velocidade cai e fica caída"]], [4.2, 5.6, 6.6])
+S += [Paragraph("A.2 Malha fechada: o controle com \"olhos\"", h2),
+      P("Um <b>sensor</b> mede a saída, um <b>somador</b> compara com a referência e o controlador age sobre a diferença, o <b>erro</b> e = r − y. "
+        "Enquanto houver erro, a ação continua. Por isso também se chama <b>controle por realimentação</b> (feedback). "
+        "É realimentação <b>negativa</b>: a medida entra subtraindo, para que um excesso na saída reduza a ação."),
+      fig("malha_ab_fe", 15, "Figura 0 – Os mesmos blocos nas duas estruturas. A diferença é o sensor e o somador fechando o caminho de volta."),
+      ]
+S += table([["Exemplo de malha fechada", "Sensor", "O que ele corrige"],
+            ["Ar-condicionado com termostato", "termômetro", "liga e desliga conforme a temperatura real do ambiente"],
+            ["Caixa d'água com boia", "a própria boia mede o nível", "fecha a entrada quando enche, qualquer que seja o consumo"],
+            ["Piloto automático do carro", "velocímetro", "acelera mais na subida, alivia na descida"],
+            ["Seu corpo", "termorreceptores", "suor e calafrio mantêm ~36,5 °C"],
+            ["Braço robótico", "encoders nas juntas", "chega na coordenada certa mesmo com peso na garra"],
+            ["Buck com feedback (seu trabalho)", "leitura da tensão ou velocidade pelo Arduino", "ajusta o PWM quando a carga do motor muda"]], [4.6, 3.8, 8])
+S += [Paragraph("A.3 Os blocos e o papel de cada um", h2)]
+S += table([["Bloco", "Papel", "Braço robótico", "Controle de temperatura"],
+            ["R(s) referência", "o que eu quero", "coordenada (x, y, z) da peça", "25 °C"],
+            ["H(s) sensor", "os olhos", "encoders nas juntas", "termômetro lê 20 °C"],
+            ["E(s) erro", "R − H·Y", "peça a 10 cm, garra a 2 cm: 8 cm", "25 − 20 = 5 °C"],
+            ["G<sub>c</sub>(s) controlador", "o cérebro", "algoritmo calcula o sinal das juntas", "microcontrolador: \"está frio, potência alta\""],
+            ["G<sub>a</sub>(s) atuador", "o músculo", "servomotores (torque)", "relé que liga a resistência"],
+            ["G<sub>p</sub>(s) planta", "a coisa física", "braço com massa, inércia e gravidade", "volume de ar esquentando"],
+            ["Y(s) saída", "o que acontece", "posição real da garra", "temperatura real"]], [3.4, 2.6, 5.0, 5.4])
+S += [P("Cada bloco multiplica o que entra nele. Juntando, chega-se à <b>função de transferência de malha fechada</b>, deduzida com calma no capítulo 1:"),
+      eq(r"U=G_aG_c\,E,\quad Y=G_p\,U\ \Rightarrow\ \frac{Y}{E}=G_cG_aG_p=G(s);\qquad E=R-HY\ \Rightarrow\ \frac{Y}{R}=\frac{G}{1+GH}"),
+      Paragraph("A.4 Exemplo numérico: o motor com carga", h2),
+      P("Um motor tem ganho estático de 1,43 (rad/s)/V: cada volt dá 1,43 rad/s em regime. Queremos velocidade 1 (normalizada)."),
+      ]
+S += B(["<b>Malha aberta:</b> aplicamos u = 1/1,43 = 0,70 V e pronto. Funciona... até entrar uma carga: a velocidade cai para 0,75 e <b>fica lá</b>. "
+        "Se depois o motor esquenta e perde 20% de ganho, cai para 0,55. O controlador nunca percebe.",
+        "<b>Malha fechada com P (u = 10·e):</b> a velocidade fica em 0,94 (sobra um pequeno erro, típico do P). Com a carga, cai só para 0,92; com o desgaste, para 0,90. "
+        "A realimentação reduziu o efeito das duas perturbações em mais de 10 vezes.",
+        "<b>Malha fechada com PI:</b> a parcela integral continua agindo enquanto existir erro, e a velocidade <b>volta exatamente para 1</b> depois de cada perturbação."])
+S += [fig("malha_sim", 14.5, "Figura 0 – Mesmo motor nas três estruturas: carga em t = 4 s e perda de 20% de ganho em t = 7 s."),
+      P("<b>Por que isso acontece (sensibilidade):</b> em malha fechada, Y/R = KG/(1 + KG). Se KG é grande, Y/R ≈ 1 <b>qualquer que seja G</b>. A planta pode mudar que o resultado quase não muda. "
+        "Com K = 10 e G = 1,43, Y/R = 14,3/15,3 = 0,935. Se G cai 20% (1,14), Y/R = 11,4/12,4 = 0,920: só 1,6% de variação, contra 20% em malha aberta.")]
+S += table([["", "Malha aberta", "Malha fechada"],
+            ["Precisa de sensor?", "não (mais barato e simples)", "sim"],
+            ["Corrige perturbações e desgaste?", "não", "sim"],
+            ["Precisão", "depende de conhecer bem a planta", "depende de um bom sensor"],
+            ["Pode ficar instável?", "não, se a planta for estável", "<b>sim</b>: ganho demais faz oscilar (capítulo 3)"],
+            ["Quando usar", "processo previsível, sem perturbação, erro tolerável", "precisão, perturbações, planta que muda ou instável"]], [4.4, 5.8, 6.2])
+S += dica("A pergunta-chave para classificar: <b>a saída é medida e comparada com a referência?</b> Se sim, é malha fechada; se não, é aberta. "
+          "Um timer, por mais \"inteligente\" que seja, é malha aberta.")
+S.append(CondPageBreak(25 * cm))
+'''
+
+IMPED = r'''
+# ================= B impedância =================
+S += [H1("B. Impedância: resistor, capacitor e indutor", "imped"),
+      P("Quase todo controlador analógico e quase toda planta elétrica são feitos de resistores, capacitores e indutores. <b>Impedância</b> é o que permite tratar os três com a mesma regra da Lei de Ohm."),
+      Paragraph("B.1 O que é", h2),
+      P("Impedância Z é a <b>oposição que um componente oferece à corrente</b>, generalizada para sinais que variam no tempo: <b>Z = V/I</b>, medida em ohms (Ω). "
+        "No resistor é só a resistência. No capacitor e no indutor, a oposição <b>depende da frequência</b> e vem com <b>defasagem</b> entre tensão e corrente. Por isso Z é um número complexo:"),
+      eq(r"Z=R+jX\qquad Z_R=R\qquad Z_L=j\omega L\ \ (\to sL)\qquad Z_C=\frac{1}{j\omega C}\ \ (\to \frac{1}{sC})"),
+      P("A parte real R é a <b>resistência</b> (dissipa energia). A parte imaginária X é a <b>reatância</b> (armazena energia e devolve). "
+        "No domínio de Laplace troca-se jω por s, e as mesmas expressões viram funções de transferência."),
+      fig("impedancia", 15, "Figura 0 – Esquerda: o resistor não depende da frequência; o indutor cresce com ω; o capacitor cai com ω. Direita: as defasagens."),
+      Paragraph("B.2 O comportamento de cada um", h2)]
+S += table([["Componente", "Lei no tempo", "Impedância", "Baixa frequência (CC)", "Alta frequência", "Fase da corrente"],
+            ["Resistor R", "v = R·i", "R", "R", "R", "em fase (0°)"],
+            ["Indutor L", "v = L·di/dt", "jωL = sL", "curto-circuito", "circuito aberto", "atrasa 90°"],
+            ["Capacitor C", "i = C·dv/dt", "1/(jωC) = 1/(sC)", "circuito aberto", "curto-circuito", "adianta 90°"]], [2.6, 2.6, 2.8, 2.9, 2.8, 2.7])
+S += [P("Intuição física: o capacitor carregado <b>bloqueia corrente contínua</b>, mas uma tensão que oscila rápido o carrega e descarrega o tempo todo e a corrente passa. "
+        "O indutor <b>resiste a mudanças de corrente</b>: em CC é só um fio, mas não deixa a corrente variar rápido. "
+        "As defasagens (capacitor adianta, indutor atrasa) são a origem física do \"avanço\" e do \"atraso\" de fase dos compensadores (capítulo 8)."),
+      Paragraph("B.3 Como combinar (igual a resistores)", h2)]
+S += B(["<b>Série:</b> Z = Z<sub>1</sub> + Z<sub>2</sub>. Ex.: resistor + indutor da armadura do motor: Z = R<sub>a</sub> + sL<sub>a</sub>.",
+        "<b>Paralelo:</b> Z = Z<sub>1</sub>Z<sub>2</sub>/(Z<sub>1</sub> + Z<sub>2</sub>). Ex.: R ∥ C = R/(1 + sRC).",
+        "<b>Divisor de tensão:</b> V<sub>o</sub>/V<sub>i</sub> = Z<sub>2</sub>/(Z<sub>1</sub> + Z<sub>2</sub>). É assim que se tira a função de transferência de redes RC em uma linha."])
+S += exemplo("Exemplos: tirando funções de transferência com impedância",
+             P("<b>Filtro passa-baixas RC</b> (R em série, C na saída): V<sub>o</sub>/V<sub>i</sub> = (1/sC)/(R + 1/sC) = <b>1/(RCs + 1)</b>. Um polo em −1/RC: deixa passar baixas frequências e a resposta ao degrau é de 1ª ordem (τ = RC)."),
+             P("<b>Passa-altas</b> (C em série, R na saída): V<sub>o</sub>/V<sub>i</sub> = R/(R + 1/sC) = <b>RCs/(RCs + 1)</b>. Um zero na origem e um polo em −1/RC: bloqueia CC."),
+             P("<b>Armadura do motor:</b> I<sub>a</sub>/(V<sub>a</sub> − E<sub>a</sub>) = 1/(L<sub>a</sub>s + R<sub>a</sub>), polo em −R<sub>a</sub>/L<sub>a</sub> (capítulo 9)."),
+             P("<b>Valores:</b> com C = 10 µF a 60 Hz (ω = 377 rad/s), |Z<sub>C</sub>| = 1/(377·10<super>−5</super>) ≈ 265 Ω. A 6 kHz cai para ≈ 2,65 Ω."))
+S += dica("No amp-op (próxima seção), a função de transferência é sempre −Z<sub>f</sub>/Z<sub>i</sub>. Saber escrever a impedância de cada rede (R, 1/sC, R + 1/sC, R ∥ C) é tudo que você precisa para projetar P, I, D, PI, PD e avanço/atraso com circuitos.")
+S.append(CondPageBreak(25 * cm))
+'''

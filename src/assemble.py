@@ -33,12 +33,10 @@ def H1(text, key):
 def H2k(text, key):
     p = Paragraph(text, h2); p._key = key; return p
 '''
-capa = R(capa, "Guia de estudo: da função de transferência ao lugar das raízes e aos compensadores de avanço e atraso",
-         "Guia de estudo: do amplificador operacional e da função de transferência ao lugar das raízes, PID, acionamentos, Nyquist, espaço de estados e transformada Z")
+capa = CAPA_NOVA
 capa += r'''
-S += [Paragraph("Sumário", h1),
-      P("<i>No topo de cada página há uma linha \"Revise antes\" com as páginas onde estão os conceitos que aquela página usa.</i>")]
-TOC = [("mapa", "0. Como encarar a matéria (o mapa)"), ("ampop", "A. Amplificador operacional: o controle em forma de circuito"),
+S += [Paragraph("Sumário", h2)]
+TOC = [("mapa", "0. Como encarar a matéria (o mapa)"), ("malha", "A. Malha aberta e malha fechada (com exemplos)"), ("imped", "B. Impedância: resistor, capacitor e indutor"), ("ampop", "C. Amplificador operacional: o controle em forma de circuito"),
        ("ft", "1. Laplace, função de transferência e diagramas de blocos"), ("polos", "2. Polos, zeros e a resposta do sistema"),
        ("estab", "3. Estabilidade e instabilidade"), ("erro", "4. Tipo do sistema e erro em regime permanente"),
        ("lgr", "5. Lugar das raízes (LGR)"), ("k", "6. Como achar o K"), ("ctrl", "7. Controladores: P, I, D, PD, PI, PID, on-off e outros"),
@@ -48,14 +46,24 @@ TOC = [("mapa", "0. Como encarar a matéria (o mapa)"), ("ampop", "A. Amplificad
        ("form", "15. Formulário de bolso e MATLAB")]
 for key, t in TOC:
     pg = PREV.get(key, "")
-    S.append(Table([[Paragraph(t, ParagraphStyle("su", parent=body, fontSize=11, leading=15, spaceAfter=0)), Paragraph(str(pg), ParagraphStyle("sp", parent=body, alignment=2, spaceAfter=0))]],
-                   colWidths=[15 * cm, 1.4 * cm], style=TableStyle([("LINEBELOW", (0, 0), (-1, -1), .3, colors.HexColor("#ccd")), ("TOPPADDING", (0, 0), (-1, -1), 3), ("BOTTOMPADDING", (0, 0), (-1, -1), 3)])))
+    S.append(Table([[Paragraph(t, ParagraphStyle("su", parent=body, fontSize=10, leading=12.5, spaceAfter=0)), Paragraph(str(pg), ParagraphStyle("sp", parent=body, alignment=2, spaceAfter=0))]],
+                   colWidths=[15 * cm, 1.4 * cm], style=TableStyle([("LINEBELOW", (0, 0), (-1, -1), .3, colors.HexColor("#ccd")), ("TOPPADDING", (0, 0), (-1, -1), 1.5), ("BOTTOMPADDING", (0, 0), (-1, -1), 1.5)])))
 '''
 mapa = R(mapa, 'Paragraph("0. Como encarar a matéria (o mapa)", h1)', 'H1("0. Como encarar a matéria (o mapa)", "mapa")')
-ampop = R(ampop, 'Paragraph("A. Amplificador operacional: o controle em forma de circuito", h1)', 'H1("A. Amplificador operacional: o controle em forma de circuito", "ampop")')
+mapa = mapa.replace('S.append(CondPageBreak(25 * cm))', 'S.append(CondPageBreak(12 * cm))')
+ampop = R(ampop, 'Paragraph("A. Amplificador operacional: o controle em forma de circuito", h1)', 'H1("C. Amplificador operacional: o controle em forma de circuito", "ampop")')
+for a_, b_ in [('"A.1 O que é"', '"C.1 O que é"'), ('"A.2 As duas regras', '"C.2 As duas regras'), ('"A.3 Inversor', '"C.3 Inversor'), ('"A.4 Não inversor', '"C.4 Não inversor'), ('"A.5 Cada ação', '"C.5 Cada ação')]:
+    ampop = ampop.replace(a_, b_)
+ampop = ampop.replace("Antes das contas, vale entender", "Com malha e impedância em mãos, vale entender")
 ampop = R(ampop, "atraso e avanço de fase (seção 6)", "atraso e avanço de fase (seções 7 e 8)")
 ft = R(ft, 'Paragraph("1. Laplace, função de transferência e diagramas de blocos", h1)', 'H1("1. Laplace, função de transferência e diagramas de blocos", "ft")')
 ft = R(ft, 'Paragraph("1.4 FTMA, FTMF e equação característica", h2)', 'H2k("1.4 FTMA, FTMF e equação característica", "ftma")')
+# ft: remove old 1.3 (moved to A) and renumber
+_i = ft.index('S += [CondPageBreak(9 * cm), Paragraph("1.3 Malha aberta × malha fechada: a ideia", h2),')
+_j = ft.index('      CondPageBreak(9 * cm), H2k("1.4 FTMA, FTMF e equação característica", "ftma"),')
+ft = ft[:_i] + "S += [\n" + ft[_j:]
+ft = ft.replace('H2k("1.4 FTMA, FTMF e equação característica", "ftma")', 'H2k("1.3 FTMA, FTMF e equação característica (malha fechada em fórmulas)", "ftma")')
+ft = ft.replace('Paragraph("1.5 Diagramas de blocos, redução e Mason", h2)', 'Paragraph("1.4 Diagramas de blocos, redução e Mason", h2)')
 polos = R(polos, 'Paragraph("2. Polos, zeros e a resposta do sistema", h1)', 'H1("2. Polos, zeros e a resposta do sistema", "polos")')
 polos = R(polos, 'Paragraph("2.1 Sistemas de 2ª ordem: ζ, ω<sub>n</sub>, ω<sub>d</sub>", h2)', 'H2k("2.1 Sistemas de 2ª ordem: ζ, ω<sub>n</sub>, ω<sub>d</sub>", "zeta")')
 polos = polos.rstrip()
@@ -102,13 +110,13 @@ form = R(form, '["Deficiência angular", "φ = −180° − ∠G(s<sub>d</sub>) 
 build = r'''
 # ================= build (two passes: page numbers for TOC and headers) =================
 import json, os
-LABEL = {"mapa": "Mapa", "ampop": "Amp-op", "ft": "Laplace e FT", "ftma": "FTMA/FTMF", "polos": "Polos e zeros", "zeta": "ζ e ωn",
+LABEL = {"mapa": "Mapa", "malha": "Malha aberta/fechada", "imped": "Impedância", "ampop": "Amp-op", "ft": "Laplace e FT", "ftma": "FTMA/FTMF", "polos": "Polos e zeros", "zeta": "ζ e ωn",
          "estab": "Estabilidade", "routh": "Routh", "erro": "Erro em regime", "lgr": "LGR", "lgrb": "LGR básico", "regras": "Regras do LGR",
          "k": "Como achar K", "ctrl": "Controladores", "pid": "PID", "comp": "Avanço/atraso", "acion": "Acionamentos", "nyq": "Nyquist",
          "ss": "Estados", "z": "Transformada Z", "ex": "Exercícios", "prop": "Propostos", "form": "Formulário"}
-PRE = {"mapa": [], "ampop": ["ctrl", "comp"], "ft": ["mapa", "ampop"], "polos": ["ft", "ftma"], "estab": ["polos", "ftma"],
+PRE = {"mapa": [], "malha": ["mapa"], "imped": ["malha"], "ampop": ["imped", "malha"], "ft": ["malha", "imped"], "polos": ["ft", "ftma"], "estab": ["polos", "ftma"],
        "erro": ["ftma", "estab"], "lgr": ["polos", "zeta", "estab", "routh"], "k": ["regras", "routh", "erro"],
-       "ctrl": ["erro", "lgrb", "regras", "ampop"], "comp": ["ctrl", "regras", "k", "ampop"], "acion": ["ft", "zeta", "erro", "pid"],
+       "ctrl": ["malha", "erro", "lgrb", "regras", "ampop"], "comp": ["ctrl", "regras", "k", "imped", "ampop"], "acion": ["malha", "imped", "ft", "zeta", "pid"],
        "nyq": ["estab", "routh", "lgr"], "ss": ["ft", "zeta", "polos", "ctrl"], "z": ["ft", "estab", "pid"],
        "ex": ["polos", "estab", "routh", "regras", "k", "pid", "comp"], "prop": ["ex", "regras", "comp"], "form": []}
 CHAP = set(PRE)
@@ -125,7 +133,7 @@ def on_page(c, d):
     c.drawRightString(A4[0] - 2 * cm, 1.2 * cm, f"{d.page}")
     c.setStrokeColor(colors.HexColor("#ccd")); c.line(2 * cm, 1.55 * cm, A4[0] - 2 * cm, 1.55 * cm); c.restoreState()
 def on_page_end(c, d):
-    if d.page <= 2: return
+    if d.page <= 1: return
     # chapter active on this page: last chapter started on or before this page (from the previous pass)
     ch = None
     for k, p in sorted(PREV.items(), key=lambda kv: kv[1]):
@@ -148,7 +156,7 @@ def make(path):
     return d
 '''
 
-body_parts = [mapa, ampop, ft, polos, ESTAB, erro, lgr, kk, ctrl, comp, ACION, NYQ, SS, ZT, ex, prop, form]
+body_parts = [mapa, MALHA, IMPED, ampop, ft, polos, ESTAB, erro, lgr, kk, ctrl, comp, ACION, NYQ, SS, ZT, ex, prop, form]
 story_fn = "def story():\n    global S\n    S = []\n" + "\n".join("    " + l for l in (capa + "\n".join(body_parts)).splitlines()) + "\n    return S\n"
 main = r'''
 PAGECH = {}

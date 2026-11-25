@@ -105,13 +105,13 @@ PZ = {'Função de transferência e polos': 'Polos −1 e −3, reais e negativo
 
 # ================= build (two passes: page numbers for TOC and headers) =================
 import json, os
-LABEL = {"mapa": "Mapa", "ampop": "Amp-op", "ft": "Laplace e FT", "ftma": "FTMA/FTMF", "polos": "Polos e zeros", "zeta": "ζ e ωn",
+LABEL = {"mapa": "Mapa", "malha": "Malha aberta/fechada", "imped": "Impedância", "ampop": "Amp-op", "ft": "Laplace e FT", "ftma": "FTMA/FTMF", "polos": "Polos e zeros", "zeta": "ζ e ωn",
          "estab": "Estabilidade", "routh": "Routh", "erro": "Erro em regime", "lgr": "LGR", "lgrb": "LGR básico", "regras": "Regras do LGR",
          "k": "Como achar K", "ctrl": "Controladores", "pid": "PID", "comp": "Avanço/atraso", "acion": "Acionamentos", "nyq": "Nyquist",
          "ss": "Estados", "z": "Transformada Z", "ex": "Exercícios", "prop": "Propostos", "form": "Formulário"}
-PRE = {"mapa": [], "ampop": ["ctrl", "comp"], "ft": ["mapa", "ampop"], "polos": ["ft", "ftma"], "estab": ["polos", "ftma"],
+PRE = {"mapa": [], "malha": ["mapa"], "imped": ["malha"], "ampop": ["imped", "malha"], "ft": ["malha", "imped"], "polos": ["ft", "ftma"], "estab": ["polos", "ftma"],
        "erro": ["ftma", "estab"], "lgr": ["polos", "zeta", "estab", "routh"], "k": ["regras", "routh", "erro"],
-       "ctrl": ["erro", "lgrb", "regras", "ampop"], "comp": ["ctrl", "regras", "k", "ampop"], "acion": ["ft", "zeta", "erro", "pid"],
+       "ctrl": ["malha", "erro", "lgrb", "regras", "ampop"], "comp": ["ctrl", "regras", "k", "imped", "ampop"], "acion": ["malha", "imped", "ft", "zeta", "pid"],
        "nyq": ["estab", "routh", "lgr"], "ss": ["ft", "zeta", "polos", "ctrl"], "z": ["ft", "estab", "pid"],
        "ex": ["polos", "estab", "routh", "regras", "k", "pid", "comp"], "prop": ["ex", "regras", "comp"], "form": []}
 CHAP = set(PRE)
@@ -128,7 +128,7 @@ def on_page(c, d):
     c.drawRightString(A4[0] - 2 * cm, 1.2 * cm, f"{d.page}")
     c.setStrokeColor(colors.HexColor("#ccd")); c.line(2 * cm, 1.55 * cm, A4[0] - 2 * cm, 1.55 * cm); c.restoreState()
 def on_page_end(c, d):
-    if d.page <= 2: return
+    if d.page <= 1: return
     # chapter active on this page: last chapter started on or before this page (from the previous pass)
     ch = None
     for k, p in sorted(PREV.items(), key=lambda kv: kv[1]):
@@ -152,22 +152,16 @@ def make(path):
 def story():
     global S
     S = []
+    
     # ================= CAPA =================
-    S += [Spacer(1, 3 * cm),
-          Paragraph("Teoria de Controle", ParagraphStyle("t", fontName="DVB", fontSize=30, leading=36, textColor=NAVY, alignment=TA_CENTER)),
-          Spacer(1, 10),
-          Paragraph("Guia de estudo: do amplificador operacional e da função de transferência ao lugar das raízes, PID, acionamentos, Nyquist, espaço de estados e transformada Z",
-                    ParagraphStyle("st", fontName="DV", fontSize=14, leading=19, alignment=TA_CENTER, textColor=BLUE)),
-          Spacer(1, 1.2 * cm), fig("lgr_principal", 12),
-          Spacer(1, .6 * cm),
-          Paragraph("Montado a partir das anotações da aula (sistema 1/[s(s+1)(s+2)], compensador K<sub>c</sub>(s+0,05)/(s+0,005)), "
-                    "com teoria, exemplos numéricos conferidos e exercícios resolvidos.", ParagraphStyle("c", parent=cap, fontSize=10, leading=13)),
-          PageBreak()]
+    S += [Paragraph("Teoria de Controle – guia de estudo", ParagraphStyle("t", fontName="DVB", fontSize=24, leading=29, textColor=NAVY)),
+          Paragraph("Montado a partir das aulas, slides e listas (UFOP). Todas as contas foram conferidas numericamente. "
+                    "No topo de cada página, a linha <i>Revise antes</i> mostra onde estão os conceitos que ela usa.",
+                    ParagraphStyle("st", parent=body, fontSize=10.5, leading=14, textColor=colors.HexColor("#444"))),
+          Spacer(1, 6)]
     
-    
-    S += [Paragraph("Sumário", h1),
-          P("<i>No topo de cada página há uma linha \"Revise antes\" com as páginas onde estão os conceitos que aquela página usa.</i>")]
-    TOC = [("mapa", "0. Como encarar a matéria (o mapa)"), ("ampop", "A. Amplificador operacional: o controle em forma de circuito"),
+    S += [Paragraph("Sumário", h2)]
+    TOC = [("mapa", "0. Como encarar a matéria (o mapa)"), ("malha", "A. Malha aberta e malha fechada (com exemplos)"), ("imped", "B. Impedância: resistor, capacitor e indutor"), ("ampop", "C. Amplificador operacional: o controle em forma de circuito"),
            ("ft", "1. Laplace, função de transferência e diagramas de blocos"), ("polos", "2. Polos, zeros e a resposta do sistema"),
            ("estab", "3. Estabilidade e instabilidade"), ("erro", "4. Tipo do sistema e erro em regime permanente"),
            ("lgr", "5. Lugar das raízes (LGR)"), ("k", "6. Como achar o K"), ("ctrl", "7. Controladores: P, I, D, PD, PI, PID, on-off e outros"),
@@ -177,8 +171,8 @@ def story():
            ("form", "15. Formulário de bolso e MATLAB")]
     for key, t in TOC:
         pg = PREV.get(key, "")
-        S.append(Table([[Paragraph(t, ParagraphStyle("su", parent=body, fontSize=11, leading=15, spaceAfter=0)), Paragraph(str(pg), ParagraphStyle("sp", parent=body, alignment=2, spaceAfter=0))]],
-                       colWidths=[15 * cm, 1.4 * cm], style=TableStyle([("LINEBELOW", (0, 0), (-1, -1), .3, colors.HexColor("#ccd")), ("TOPPADDING", (0, 0), (-1, -1), 3), ("BOTTOMPADDING", (0, 0), (-1, -1), 3)])))
+        S.append(Table([[Paragraph(t, ParagraphStyle("su", parent=body, fontSize=10, leading=12.5, spaceAfter=0)), Paragraph(str(pg), ParagraphStyle("sp", parent=body, alignment=2, spaceAfter=0))]],
+                       colWidths=[15 * cm, 1.4 * cm], style=TableStyle([("LINEBELOW", (0, 0), (-1, -1), .3, colors.HexColor("#ccd")), ("TOPPADDING", (0, 0), (-1, -1), 1.5), ("BOTTOMPADDING", (0, 0), (-1, -1), 1.5)])))
     # ================= 0 =================
     S += [Spacer(1, 10), H1("0. Como encarar a matéria (o mapa)", "mapa"),
           P("Quase todo problema desta disciplina segue o mesmo caminho. Se você souber em que etapa está, sabe qual ferramenta usar:")]
@@ -195,36 +189,127 @@ def story():
               "Ou seja: a FTMA é o ponto de partida de quase tudo.",
               "Transitório (oscilação, rapidez) → olhe os <b>polos de malha fechada</b>. "
               "Regime (erro) → olhe o <b>tipo</b> e o <b>ganho de baixa frequência</b> da FTMA.")
+    S.append(CondPageBreak(12 * cm))
+    
+    
+    
+    # ================= A malha aberta/fechada =================
+    S += [H1("A. Malha aberta e malha fechada", "malha"),
+          P("Esta é a ideia que dá nome à disciplina. Um <b>sistema de controle</b> faz alguma grandeza física (a saída y: velocidade, temperatura, posição, nível) "
+            "seguir um valor desejado (a <b>referência</b> r), mesmo com perturbações. Existem dois jeitos de fazer isso."),
+          Paragraph("A.1 Malha aberta: o controle \"cego\"", h2),
+          P("O controlador calcula a ação <b>uma vez</b>, a partir da referência, e manda para o atuador. <b>Ninguém mede o resultado.</b> "
+            "Se algo mudar no caminho (carga, desgaste, temperatura ambiente), a saída erra e o controlador nem fica sabendo. Matematicamente, Y(s) = G(s)·R(s)."),
+          ]
+    S += table([["Exemplo de malha aberta", "Como funciona", "O que dá errado"],
+                ["Torradeira de 2 minutos", "liga a resistência por um tempo fixo", "pão mais úmido ou mais grosso sai claro; pão fino queima"],
+                ["Máquina de lavar por timer", "cada etapa dura um tempo programado", "não sabe se a roupa está limpa"],
+                ["Semáforo de tempo fixo", "verde por 40 s, vermelho por 30 s", "não vê a fila de carros"],
+                ["Irrigação por timer", "liga a água 10 min por dia", "rega mesmo depois de chover"],
+                ["Motor CC ligado direto na tensão", "aplica a tensão que daria a velocidade desejada", "com carga, a velocidade cai e fica caída"]], [4.2, 5.6, 6.6])
+    S += [Paragraph("A.2 Malha fechada: o controle com \"olhos\"", h2),
+          P("Um <b>sensor</b> mede a saída, um <b>somador</b> compara com a referência e o controlador age sobre a diferença, o <b>erro</b> e = r − y. "
+            "Enquanto houver erro, a ação continua. Por isso também se chama <b>controle por realimentação</b> (feedback). "
+            "É realimentação <b>negativa</b>: a medida entra subtraindo, para que um excesso na saída reduza a ação."),
+          fig("malha_ab_fe", 15, "Figura 0 – Os mesmos blocos nas duas estruturas. A diferença é o sensor e o somador fechando o caminho de volta."),
+          ]
+    S += table([["Exemplo de malha fechada", "Sensor", "O que ele corrige"],
+                ["Ar-condicionado com termostato", "termômetro", "liga e desliga conforme a temperatura real do ambiente"],
+                ["Caixa d'água com boia", "a própria boia mede o nível", "fecha a entrada quando enche, qualquer que seja o consumo"],
+                ["Piloto automático do carro", "velocímetro", "acelera mais na subida, alivia na descida"],
+                ["Seu corpo", "termorreceptores", "suor e calafrio mantêm ~36,5 °C"],
+                ["Braço robótico", "encoders nas juntas", "chega na coordenada certa mesmo com peso na garra"],
+                ["Buck com feedback (seu trabalho)", "leitura da tensão ou velocidade pelo Arduino", "ajusta o PWM quando a carga do motor muda"]], [4.6, 3.8, 8])
+    S += [Paragraph("A.3 Os blocos e o papel de cada um", h2)]
+    S += table([["Bloco", "Papel", "Braço robótico", "Controle de temperatura"],
+                ["R(s) referência", "o que eu quero", "coordenada (x, y, z) da peça", "25 °C"],
+                ["H(s) sensor", "os olhos", "encoders nas juntas", "termômetro lê 20 °C"],
+                ["E(s) erro", "R − H·Y", "peça a 10 cm, garra a 2 cm: 8 cm", "25 − 20 = 5 °C"],
+                ["G<sub>c</sub>(s) controlador", "o cérebro", "algoritmo calcula o sinal das juntas", "microcontrolador: \"está frio, potência alta\""],
+                ["G<sub>a</sub>(s) atuador", "o músculo", "servomotores (torque)", "relé que liga a resistência"],
+                ["G<sub>p</sub>(s) planta", "a coisa física", "braço com massa, inércia e gravidade", "volume de ar esquentando"],
+                ["Y(s) saída", "o que acontece", "posição real da garra", "temperatura real"]], [3.4, 2.6, 5.0, 5.4])
+    S += [P("Cada bloco multiplica o que entra nele. Juntando, chega-se à <b>função de transferência de malha fechada</b>, deduzida com calma no capítulo 1:"),
+          eq(r"U=G_aG_c\,E,\quad Y=G_p\,U\ \Rightarrow\ \frac{Y}{E}=G_cG_aG_p=G(s);\qquad E=R-HY\ \Rightarrow\ \frac{Y}{R}=\frac{G}{1+GH}"),
+          Paragraph("A.4 Exemplo numérico: o motor com carga", h2),
+          P("Um motor tem ganho estático de 1,43 (rad/s)/V: cada volt dá 1,43 rad/s em regime. Queremos velocidade 1 (normalizada)."),
+          ]
+    S += B(["<b>Malha aberta:</b> aplicamos u = 1/1,43 = 0,70 V e pronto. Funciona... até entrar uma carga: a velocidade cai para 0,75 e <b>fica lá</b>. "
+            "Se depois o motor esquenta e perde 20% de ganho, cai para 0,55. O controlador nunca percebe.",
+            "<b>Malha fechada com P (u = 10·e):</b> a velocidade fica em 0,94 (sobra um pequeno erro, típico do P). Com a carga, cai só para 0,92; com o desgaste, para 0,90. "
+            "A realimentação reduziu o efeito das duas perturbações em mais de 10 vezes.",
+            "<b>Malha fechada com PI:</b> a parcela integral continua agindo enquanto existir erro, e a velocidade <b>volta exatamente para 1</b> depois de cada perturbação."])
+    S += [fig("malha_sim", 14.5, "Figura 0 – Mesmo motor nas três estruturas: carga em t = 4 s e perda de 20% de ganho em t = 7 s."),
+          P("<b>Por que isso acontece (sensibilidade):</b> em malha fechada, Y/R = KG/(1 + KG). Se KG é grande, Y/R ≈ 1 <b>qualquer que seja G</b>. A planta pode mudar que o resultado quase não muda. "
+            "Com K = 10 e G = 1,43, Y/R = 14,3/15,3 = 0,935. Se G cai 20% (1,14), Y/R = 11,4/12,4 = 0,920: só 1,6% de variação, contra 20% em malha aberta.")]
+    S += table([["", "Malha aberta", "Malha fechada"],
+                ["Precisa de sensor?", "não (mais barato e simples)", "sim"],
+                ["Corrige perturbações e desgaste?", "não", "sim"],
+                ["Precisão", "depende de conhecer bem a planta", "depende de um bom sensor"],
+                ["Pode ficar instável?", "não, se a planta for estável", "<b>sim</b>: ganho demais faz oscilar (capítulo 3)"],
+                ["Quando usar", "processo previsível, sem perturbação, erro tolerável", "precisão, perturbações, planta que muda ou instável"]], [4.4, 5.8, 6.2])
+    S += dica("A pergunta-chave para classificar: <b>a saída é medida e comparada com a referência?</b> Se sim, é malha fechada; se não, é aberta. "
+              "Um timer, por mais \"inteligente\" que seja, é malha aberta.")
     S.append(CondPageBreak(25 * cm))
     
     
+    # ================= B impedância =================
+    S += [H1("B. Impedância: resistor, capacitor e indutor", "imped"),
+          P("Quase todo controlador analógico e quase toda planta elétrica são feitos de resistores, capacitores e indutores. <b>Impedância</b> é o que permite tratar os três com a mesma regra da Lei de Ohm."),
+          Paragraph("B.1 O que é", h2),
+          P("Impedância Z é a <b>oposição que um componente oferece à corrente</b>, generalizada para sinais que variam no tempo: <b>Z = V/I</b>, medida em ohms (Ω). "
+            "No resistor é só a resistência. No capacitor e no indutor, a oposição <b>depende da frequência</b> e vem com <b>defasagem</b> entre tensão e corrente. Por isso Z é um número complexo:"),
+          eq(r"Z=R+jX\qquad Z_R=R\qquad Z_L=j\omega L\ \ (\to sL)\qquad Z_C=\frac{1}{j\omega C}\ \ (\to \frac{1}{sC})"),
+          P("A parte real R é a <b>resistência</b> (dissipa energia). A parte imaginária X é a <b>reatância</b> (armazena energia e devolve). "
+            "No domínio de Laplace troca-se jω por s, e as mesmas expressões viram funções de transferência."),
+          fig("impedancia", 15, "Figura 0 – Esquerda: o resistor não depende da frequência; o indutor cresce com ω; o capacitor cai com ω. Direita: as defasagens."),
+          Paragraph("B.2 O comportamento de cada um", h2)]
+    S += table([["Componente", "Lei no tempo", "Impedância", "Baixa frequência (CC)", "Alta frequência", "Fase da corrente"],
+                ["Resistor R", "v = R·i", "R", "R", "R", "em fase (0°)"],
+                ["Indutor L", "v = L·di/dt", "jωL = sL", "curto-circuito", "circuito aberto", "atrasa 90°"],
+                ["Capacitor C", "i = C·dv/dt", "1/(jωC) = 1/(sC)", "circuito aberto", "curto-circuito", "adianta 90°"]], [2.6, 2.6, 2.8, 2.9, 2.8, 2.7])
+    S += [P("Intuição física: o capacitor carregado <b>bloqueia corrente contínua</b>, mas uma tensão que oscila rápido o carrega e descarrega o tempo todo e a corrente passa. "
+            "O indutor <b>resiste a mudanças de corrente</b>: em CC é só um fio, mas não deixa a corrente variar rápido. "
+            "As defasagens (capacitor adianta, indutor atrasa) são a origem física do \"avanço\" e do \"atraso\" de fase dos compensadores (capítulo 8)."),
+          Paragraph("B.3 Como combinar (igual a resistores)", h2)]
+    S += B(["<b>Série:</b> Z = Z<sub>1</sub> + Z<sub>2</sub>. Ex.: resistor + indutor da armadura do motor: Z = R<sub>a</sub> + sL<sub>a</sub>.",
+            "<b>Paralelo:</b> Z = Z<sub>1</sub>Z<sub>2</sub>/(Z<sub>1</sub> + Z<sub>2</sub>). Ex.: R ∥ C = R/(1 + sRC).",
+            "<b>Divisor de tensão:</b> V<sub>o</sub>/V<sub>i</sub> = Z<sub>2</sub>/(Z<sub>1</sub> + Z<sub>2</sub>). É assim que se tira a função de transferência de redes RC em uma linha."])
+    S += exemplo("Exemplos: tirando funções de transferência com impedância",
+                 P("<b>Filtro passa-baixas RC</b> (R em série, C na saída): V<sub>o</sub>/V<sub>i</sub> = (1/sC)/(R + 1/sC) = <b>1/(RCs + 1)</b>. Um polo em −1/RC: deixa passar baixas frequências e a resposta ao degrau é de 1ª ordem (τ = RC)."),
+                 P("<b>Passa-altas</b> (C em série, R na saída): V<sub>o</sub>/V<sub>i</sub> = R/(R + 1/sC) = <b>RCs/(RCs + 1)</b>. Um zero na origem e um polo em −1/RC: bloqueia CC."),
+                 P("<b>Armadura do motor:</b> I<sub>a</sub>/(V<sub>a</sub> − E<sub>a</sub>) = 1/(L<sub>a</sub>s + R<sub>a</sub>), polo em −R<sub>a</sub>/L<sub>a</sub> (capítulo 9)."),
+                 P("<b>Valores:</b> com C = 10 µF a 60 Hz (ω = 377 rad/s), |Z<sub>C</sub>| = 1/(377·10<super>−5</super>) ≈ 265 Ω. A 6 kHz cai para ≈ 2,65 Ω."))
+    S += dica("No amp-op (próxima seção), a função de transferência é sempre −Z<sub>f</sub>/Z<sub>i</sub>. Saber escrever a impedância de cada rede (R, 1/sC, R + 1/sC, R ∥ C) é tudo que você precisa para projetar P, I, D, PI, PD e avanço/atraso com circuitos.")
+    S.append(CondPageBreak(25 * cm))
+    
     # ================= A amp-op =================
-    S += [H1("A. Amplificador operacional: o controle em forma de circuito", "ampop"),
-          P("Antes das contas, vale entender <b>com que peça física</b> se monta um controlador analógico. Quase sempre é o amplificador operacional (amp-op). "
+    S += [H1("C. Amplificador operacional: o controle em forma de circuito", "ampop"),
+          P("Com malha e impedância em mãos, vale entender <b>com que peça física</b> se monta um controlador analógico. Quase sempre é o amplificador operacional (amp-op). "
             "Somador do erro, ganho K<sub>p</sub>, integrador, derivador, avanço, atraso e PID inteiro são todos amp-ops com resistores e capacitores em volta. "
             "Dominando duas regras e uma fórmula, você lê qualquer circuito de controle."),
-          Paragraph("A.1 O que é", h2),
+          Paragraph("C.1 O que é", h2),
           P("É um amplificador <b>diferencial</b> de ganho enorme: v<sub>o</sub> = A(v<sub>+</sub> − v<sub>−</sub>), com A da ordem de 10<super>5</super> a 10<super>6</super>. "
             "Tem duas entradas (inversora −, não inversora +), uma saída e é alimentado por ±V<sub>cc</sub> (ex.: ±12 V). "
             "A saída nunca passa da alimentação: se a conta der 20 V com fonte de 12 V, ela <b>satura</b> em ~12 V."),
           fig("ampop", 16.5, "Figura 0 – Amp-op ideal e os circuitos básicos usados em controle."),
-          Paragraph("A.2 As duas regras de ouro (amp-op ideal)", h2)]
+          Paragraph("C.2 As duas regras de ouro (amp-op ideal)", h2)]
     S += B(["<b>Regra 1 – não entra corrente nas entradas:</b> i<sub>+</sub> = i<sub>−</sub> = 0 (impedância de entrada infinita).",
             "<b>Regra 2 – curto-circuito virtual:</b> com realimentação <b>negativa</b> (saída ligada de volta à entrada −), v<sub>+</sub> = v<sub>−</sub>. "
             "Motivo: v<sub>+</sub> − v<sub>−</sub> = v<sub>o</sub>/A. Com A ≈ 10<super>5</super> e v<sub>o</sub> de poucos volts, a diferença é de microvolts, praticamente zero.",
             "Repare: o amp-op realimentado <b>já é um sistema de controle em malha fechada</b>. Ele mexe na saída até zerar o \"erro\" v<sub>+</sub> − v<sub>−</sub>."])
-    S += [Paragraph("A.3 Inversor e a fórmula que resolve tudo: −Z<sub>f</sub>/Z<sub>i</sub>", h2),
+    S += [Paragraph("C.3 Inversor e a fórmula que resolve tudo: −Z<sub>f</sub>/Z<sub>i</sub>", h2),
           P("No inversor, v<sub>+</sub> = 0 ⇒ v<sub>−</sub> = 0 (terra virtual). A corrente que entra por R<sub>1</sub>, v<sub>i</sub>/R<sub>1</sub>, não entra no amp-op (regra 1). "
             "Então ela passa toda por R: v<sub>i</sub>/R<sub>1</sub> = −v<sub>o</sub>/R ⇒ <b>v<sub>o</sub> = −(R/R<sub>1</sub>)v<sub>i</sub></b>. "
             "Trocando os resistores por impedâncias no domínio s (resistor R, capacitor 1/(sC)), vale para qualquer rede:"),
           eq(r"\frac{V_o(s)}{V_i(s)}=-\frac{Z_f(s)}{Z_i(s)}\qquad Z_R=R,\quad Z_C=\frac{1}{sC}"),
-          Paragraph("A.4 Não inversor e diferencial (slides da aula)", h2),
+          Paragraph("C.4 Não inversor e diferencial (slides da aula)", h2),
           P("<b>Não inversor:</b> v<sub>i</sub> entra no +. Pela regra 2, v<sub>−</sub> = v<sub>i</sub>, e v<sub>−</sub> sai do divisor R<sub>1</sub>–R: v<sub>−</sub> = v<sub>o</sub>·R<sub>1</sub>/(R<sub>1</sub>+R). "
             "Logo <b>v<sub>c</sub> = (1 + R/R<sub>1</sub>)·v<sub>E</sub></b>: ganho positivo, sempre ≥ 1."),
           P("<b>Diferencial:</b> a referência v<sub>R</sub> entra pelo + e a medida do sensor v<sub>Y</sub> pelo −. Com resistores casados, <b>v<sub>c</sub> = (R/R<sub>1</sub>)(v<sub>R</sub> − v<sub>Y</sub>)</b>. "
             "Este circuito faz duas coisas ao mesmo tempo: o <b>somador</b> da malha (e = r − y) e o <b>ganho K<sub>p</sub> = R/R<sub>1</sub></b>. É um controlador proporcional completo. "
             "No slide, R é um potenciômetro: girar o potenciômetro é ajustar o K<sub>p</sub>, que é exatamente andar sobre o lugar das raízes."),
-          Paragraph("A.5 Cada ação de controle é uma escolha de Z<sub>i</sub> e Z<sub>f</sub>", h2)]
+          Paragraph("C.5 Cada ação de controle é uma escolha de Z<sub>i</sub> e Z<sub>f</sub>", h2)]
     S += table([["Ação", "Z<sub>i</sub> (entrada)", "Z<sub>f</sub> (realimentação)", "V<sub>o</sub>/V<sub>i</sub>", "Parâmetros"],
                 ["P", "R<sub>1</sub>", "R<sub>2</sub>", "−R<sub>2</sub>/R<sub>1</sub>", "K<sub>p</sub> = R<sub>2</sub>/R<sub>1</sub>"],
                 ["I (integrador)", "R<sub>1</sub>", "C", "−1/(R<sub>1</sub>Cs)", "K<sub>i</sub> = 1/(R<sub>1</sub>C)"],
@@ -297,21 +382,8 @@ def story():
                    "Então H<sub>o</sub> = L[1/s − 1/(s + 1/τ)] ⇒ <b>h<sub>o</sub>(t) = L(1 − e<super>−t/τ</super>)</b>: vale 0 em t = 0, L em t → ∞ e 0,632L em t = τ."),
                  P("<b>Barco (velocidade pela rotação da hélice):</b> empuxo f = Kω e atrito f<sub>B</sub> = Bv ⇒ m·dv/dt + Bv = Kω ⇒ "
                    "<b>V/Ω = K/(ms + B) = (K/m)/(s + B/m)</b>. O polo é s = −B/m, sempre no semiplano esquerdo: o barco sempre estabiliza numa velocidade."))
-    S += [CondPageBreak(9 * cm), Paragraph("1.3 Malha aberta × malha fechada: a ideia", h2),
-          P("<b>Malha aberta</b> é o controle \"cego\": a torradeira de 2 minutos não vê o pão queimando. A saída é só Y = G·R e ninguém confere o resultado. "
-            "<b>Malha fechada</b> \"tem olhos\": mede a saída, compara com o que foi pedido e usa a diferença (o <b>erro</b>) para se corrigir o tempo todo."),
-          ]
-    S += table([["Bloco", "Papel", "Braço robótico", "Controle de temperatura"],
-                ["R(s) referência", "o que eu quero", "coordenada (x, y, z) da peça", "25 °C"],
-                ["H(s) sensor", "os olhos", "encoders nas juntas", "termômetro lê 20 °C"],
-                ["E(s) erro", "R − H·Y", "peça a 10 cm, garra a 2 cm: 8 cm", "25 − 20 = 5 °C"],
-                ["G<sub>c</sub>(s) controlador", "o cérebro", "algoritmo calcula o sinal das juntas", "microcontrolador: \"está frio, potência alta\""],
-                ["G<sub>a</sub>(s) atuador", "o músculo", "servomotores (torque)", "relé que liga a resistência"],
-                ["G<sub>p</sub>(s) planta", "a coisa física", "braço com massa, inércia e gravidade", "volume de ar esquentando"],
-                ["Y(s) saída", "o que acontece", "posição real da garra", "temperatura real"]], [3.4, 2.6, 5.0, 5.4])
-    S += [P("Matematicamente, cada bloco multiplica o que entra nele:"),
-          eq(r"U=G_aG_c\,E,\quad Y=G_p\,U\ \Rightarrow\ \frac{Y}{E}=G_cG_aG_p=G(s);\qquad E=R-HY\ \Rightarrow\ \frac{Y}{R}=\frac{G}{1+GH}"),
-          CondPageBreak(9 * cm), H2k("1.4 FTMA, FTMF e equação característica", "ftma"),
+    S += [
+          CondPageBreak(9 * cm), H2k("1.3 FTMA, FTMF e equação característica (malha fechada em fórmulas)", "ftma"),
           fig("malha", 15, "Figura 2 – Malha fechada com realimentação unitária (slide: Controlador → Atuador → Planta)."),
           P("<b>FTMA</b> (função de transferência de malha aberta) é o produto de tudo que está no caminho, incluindo a realimentação: G<sub>c</sub>G<sub>p</sub>H. "
             "<b>FTMF</b> (malha fechada) relaciona saída e referência:"),
@@ -325,7 +397,7 @@ def story():
                    "p<sub>1,2</sub> = −0,3376 ± j0,5623 e p<sub>3</sub> = −2,3247."))
     S += dica("Truque para a FTMF com realimentação unitária: se FTMA = N(s)/D(s), então FTMF = N/(D + N). "
               "No exemplo, N = 1 e D = s<super>3</super>+3s<super>2</super>+2s, logo FTMF = 1/(s<super>3</super>+3s<super>2</super>+2s+1). Não precisa montar a fração dupla.")
-    S += [CondPageBreak(9 * cm), Paragraph("1.5 Diagramas de blocos, redução e Mason", h2),
+    S += [CondPageBreak(9 * cm), Paragraph("1.4 Diagramas de blocos, redução e Mason", h2),
           P("Três peças: o <b>bloco</b> (saída = G × entrada), o <b>somador</b> (o sinal de cada seta diz se soma ou subtrai) e o <b>ponto de ramificação</b> "
             "(o mesmo sinal segue para vários lugares). Com realimentação H(s):"),
           ]
