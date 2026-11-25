@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teoria de Controle interativa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+/* VOICE everyday study: a lab bench you can poke at, precise but friendly
+   IDEA an oscilloscope / control-room panel: every concept is a knob and a live trace
+   PICTURE the s-plane with draggable poles driving a live step response; later the root-locus simulator
+   COLOUR steel panel, black ink, white screens, alarm red for poles, signal blue for responses
+   TYPE Inter Tight 700 for titles, Inter for text, JetBrains Mono for readouts
+   LAYOUT laptop: explanation column beside a large live plot + knobs; phone: title, plot, knobs, text */
+:root{color-scheme:light dark;--bg:light-dark(#d5dbe0,#16191c);--panel:light-dark(#ffffff,#1f2327);--ink:light-dark(#0e1114,#e8ecef);--mute:light-dark(#4a535b,#a3adb5);--line:light-dark(#b9c2ca,#353b41);--red:#e8251a;--blue:light-dark(#1d5fd6,#6aa3ff);--green:light-dark(#1b7f3b,#4cc778);--amber:light-dark(#b86e00,#f2b33d);--grid:light-dark(#e6eaee,#2a2f34)}
+:root[data-theme=light]{color-scheme:light}
+:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+html{scroll-padding-top:64px}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3{font-family:"Inter Tight",Inter,sans-serif;letter-spacing:-.02em;line-height:1.08;margin:0 0 .4em}
+h1{font-size:clamp(32px,5vw,52px);text-wrap:balance}
+h2{font-size:clamp(26px,3.4vw,36px)}
+h3{font-size:19px;margin-top:1em}
+p{margin:.4em 0 .8em;max-width:68ch}
+a{color:var(--blue)}
+code,.mono{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:14px}
+nav{position:sticky;top:0;z-index:5;background:var(--ink);color:var(--bg);display:flex;gap:4px;overflow-x:auto;padding:8px max(5vw,16px);scrollbar-width:thin}
+nav a{flex:none;color:inherit;text-decoration:none;padding:8px 12px;border-radius:6px;font-weight:600;font-size:14px}
+nav a:hover,nav a:focus-visible{background:var(--red);color:#fff;outline:none}
+.band{padding:clamp(28px,4vw,56px) max(5vw,16px)}
+.band:nth-of-type(even){background:color-mix(in srgb,var(--bg) 70%,var(--panel))}
+.wrap{max-width:1240px;margin:0 auto}
+.grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:28px;align-items:start}
+.grid.rev{grid-template-columns:minmax(0,7fr) minmax(0,5fr)}
+.scope{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px}
+.fig{position:relative;height:320px}
+.fig.tall{height:420px}
+.fig.short{height:220px}
+.fig>canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+.knobs{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px 18px;margin-top:12px}
+.knob label{display:flex;justify-content:space-between;font-size:14px;font-weight:600}
+.knob output{font-family:"JetBrains Mono",monospace;color:var(--blue);white-space:nowrap}
+input[type=range]{width:100%;accent-color:var(--red);height:32px}
+select,input[type=text],button{font:inherit;font-size:16px;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:8px 12px;min-height:44px}
+button{cursor:pointer;font-weight:600}
+button:hover{border-color:var(--ink)}
+button.on{background:var(--ink);color:var(--bg)}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--red);outline-offset:1px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.read{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:8px;margin-top:12px}
+.read div{background:var(--bg);border-radius:7px;padding:8px 10px}
+.read b{display:block;font:500 17px "JetBrains Mono",monospace;overflow-wrap:anywhere}
+.read span{font-size:13px;color:var(--mute)}
+.note{border-left:4px solid var(--red);background:var(--panel);padding:10px 14px;border-radius:0 8px 8px 0;margin:12px 0}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--mute);margin-top:6px}
+.legend i{display:inline-block;width:14px;height:3px;vertical-align:middle;margin-right:5px}
+.steps{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.steps button{min-width:44px}
+.explain{background:var(--bg);border-radius:8px;padding:12px 14px;min-height:150px}
+.explain p{margin:.3em 0}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;font-family:"JetBrains Mono",monospace;font-size:14px}
+td,th{border:1px solid var(--line);padding:5px 10px;text-align:right;white-space:nowrap}
+.neg{color:var(--red);font-weight:700}
+.hero{background:var(--ink);color:var(--bg)}
+.hero p{color:color-mix(in srgb,var(--bg) 80%,transparent)}
+.hero .scope{color:var(--ink)}
+footer{padding:28px max(5vw,16px);font-size:14px;color:var(--mute)}
+@media(max-width:860px){.grid,.grid.rev{grid-template-columns:minmax(0,1fr)}.grid>.scope{order:-1}.fig{height:280px}.fig.tall{height:340px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<nav aria-label="Seções">
+<a href="#polos">Polos</a><a href="#segunda">2ª ordem</a><a href="#primeira">1ª ordem</a><a href="#ganho">Ganho K</a><a href="#erro">Erro</a><a href="#pid">PID</a><a href="#onoff">On-off</a><a href="#ampop">Amp-op</a><a href="#comp">Avanço/atraso</a><a href="#lgr">Simulador LGR</a>
+</nav>
+
+<section class="band hero" id="polos"><div class="wrap grid">
+<div>
+<h1>Teoria de Controle interativa</h1>
+<p>Cada conceito da disciplina vira um botão e uma curva ao vivo. Comece pelo mais importante: <b>a posição do polo no plano s define a resposta</b>. Arraste o polo vermelho e veja a resposta ao degrau mudar.</p>
+<p><b>Para a esquerda</b> (σ mais negativo): decai mais rápido. <b>Para cima</b> (ω<sub>d</sub> maior): oscila mais rápido. <b>Ângulo com o eixo real</b>: define o amortecimento ζ = cos θ e, portanto, o sobressinal. <b>Semiplano direito</b>: a resposta cresce sem parar, ou seja, o sistema é instável.</p>
+<p>Fórmulas: p = −ζω<sub>n</sub> ± jω<sub>d</sub>, M<sub>p</sub> = e<sup>−ζπ/√(1−ζ²)</sup>, t<sub>s</sub> ≈ 4/σ, t<sub>p</sub> = π/ω<sub>d</sub>.</p>
+</div>
+<div class="scope">
+<div class="grid" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px">
+<div class="fig short" style="height:260px"><canvas id="cPlane" aria-label="Plano s com polo arrastável"></canvas></div>
+<div class="fig short" style="height:260px"><canvas id="cPlaneResp" aria-label="Resposta ao degrau"></canvas></div>
+</div>
+<div class="read" id="rPlane"></div>
+</div>
+</div></section>
+
+<section class="band" id="segunda"><div class="wrap grid rev">
+<div class="scope">
+<div class="fig"><canvas id="c2"></canvas></div>
+<div class="legend"><span><i style="background:var(--blue)"></i>atual</span><span><i style="background:var(--mute)"></i>ζ = 1 (referência)</span><span><i style="background:var(--red)"></i>envelope e<sup>−σt</sup></span></div>
+<div class="knobs">
+<div class="knob"><label for="z2">ζ amortecimento <output id="oz2"></output></label><input type="range" id="z2" min="0" max="2" step="0.01" value="0.3"></div>
+<div class="knob"><label for="w2">ω<sub>n</sub> (rad/s) <output id="ow2"></output></label><input type="range" id="w2" min="0.3" max="5" step="0.05" value="2"></div>
+</div>
+<div class="read" id="r2"></div>
+</div>
+<div>
+<h2>Sistema de 2ª ordem: ζ e ω<sub>n</sub></h2>
+<p>G(s) = ω<sub>n</sub>² / (s² + 2ζω<sub>n</sub>s + ω<sub>n</sub>²). O exemplo físico é a massa-mola-amortecedor: ω<sub>n</sub>² = k/m e 2ζω<sub>n</sub> = b/m.</p>
+<p><b>ζ</b> decide <i>a forma</i> da curva: abaixo de 1 oscila (subamortecido), igual a 1 é o mais rápido sem passar do alvo (crítico), acima de 1 é lento e sem oscilação (superamortecido). <b>ω<sub>n</sub></b> decide <i>a velocidade</i>: dobrar ω<sub>n</sub> comprime a curva inteira no tempo, sem mudar o sobressinal.</p>
+<div class="note">Teste: deixe ζ fixo e mexa só em ω<sub>n</sub>. O pico continua com a mesma altura e só chega mais cedo. É por isso que "mesmo overshoot" = "mesma reta saindo da origem" no plano s.</div>
+</div>
+</div></section>
+
+<section class="band" id="primeira"><div class="wrap grid">
+<div>
+<h2>1ª ordem: τ e o ganho estático K</h2>
+<p>G(s) = K/(τs + 1), como o circuito RC (τ = RC), o tanque de nível (τ = 1/k) ou o barco com hélice (τ = m/B). O polo fica em s = −1/τ.</p>
+<p><b>τ</b> é a inércia: em t = τ a saída chega a 63,2% do final, em 4τ a 98%. <b>K</b> é o ganho estático: com K = 5, um degrau de 1 unidade leva a saída a 5 unidades em regime. Não existe sobressinal em 1ª ordem.</p>
+<p>Exemplo do caderno: y' + 2y = 1 ⇒ Y(s) = 1/[s(s+2)] = 0,5/s − 0,5/(s+2) ⇒ y(t) = 0,5 − 0,5e<sup>−2t</sup> (K = 0,5, τ = 0,5 s).</p>
+</div>
+<div class="scope">
+<div class="fig short" style="height:260px"><canvas id="c1"></canvas></div>
+<div class="knobs">
+<div class="knob"><label for="t1">τ constante de tempo (s) <output id="ot1"></output></label><input type="range" id="t1" min="0.1" max="4" step="0.05" value="1"></div>
+<div class="knob"><label for="k1">K ganho estático <output id="ok1"></output></label><input type="range" id="k1" min="0.2" max="5" step="0.1" value="1"></div>
+</div>
+</div>
+</div></section>
+
+<section class="band" id="ganho"><div class="wrap grid rev">
+<div class="scope">
+<div class="row"><label for="plantK" class="mono">planta</label><select id="plantK"></select></div>
+<div class="grid" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;margin-top:8px">
+<div class="fig short" style="height:280px"><canvas id="cKl"></canvas></div>
+<div class="fig short" style="height:280px"><canvas id="cKs"></canvas></div>
+</div>
+<div class="knobs"><div class="knob"><label for="kK">ganho K <output id="okK"></output></label><input type="range" id="kK" min="0" max="1" step="0.001" value="0.25"></div></div>
+<div class="read" id="rK"></div>
+</div>
+<div>
+<h2>O ganho K move os polos de malha fechada</h2>
+<p>Com realimentação unitária, os polos de MF são as raízes de 1 + K·G(s) = 0. Quando K varia de 0 a ∞, eles percorrem o <b>lugar das raízes</b> (a curva azul). Em K = 0 estão sobre os polos de malha aberta (×).</p>
+<p>Na planta da aula, 1/[s(s+1)(s+2)]: com K pequeno a resposta é lenta e sem oscilação. Passando de K = 0,385 os polos saem do eixo real e começa a oscilação. Em K = 6 eles cruzam o eixo jω: o sistema oscila sem parar. Acima disso, instável.</p>
+<div class="note">O controlador proporcional não muda o desenho do LGR. Ele só escolhe <i>onde</i> sobre a curva os polos ficam. Para tirar a curva do lugar é preciso zeros e polos novos (avanço, atraso, PID).</div>
+</div>
+</div></section>
+
+<section class="band" id="erro"><div class="wrap grid">
+<div>
+<h2>Erro em regime: tipo do sistema × entrada</h2>
+<p>O <b>tipo</b> é o número de integradores (polos em s = 0) na FTMA. Cada integrador faz o sistema seguir uma entrada de grau a mais sem erro.</p>
+<div class="scroll"><table><tr><th>tipo</th><th>degrau 1/s</th><th>rampa 1/s²</th><th>parábola 1/s³</th></tr><tr><td>0</td><td>1/(1+K<sub>p</sub>)</td><td>∞</td><td>∞</td></tr><tr><td>1</td><td>0</td><td>1/K<sub>v</sub></td><td>∞</td></tr><tr><td>2</td><td>0</td><td>0</td><td>1/K<sub>a</sub></td></tr></table></div>
+<p>Escolha o tipo e a entrada. A linha tracejada é a referência r(t) e a azul é a saída. Aumentar K diminui o erro finito, mas nunca o zera: só um integrador a mais zera.</p>
+</div>
+<div class="scope">
+<div class="row"><label for="tipoE" class="mono">tipo</label><select id="tipoE"><option value="0">0: K/[(s+1)(s+2)]</option><option value="1" selected>1: K/[s(s+2)]</option><option value="2">2: K(s+0,5)/[s²(s+3)]</option></select>
+<label for="entE" class="mono">entrada</label><select id="entE"><option value="0">degrau</option><option value="1" selected>rampa</option><option value="2">parábola</option></select></div>
+<div class="fig short" style="height:270px;margin-top:8px"><canvas id="cE"></canvas></div>
+<div class="knobs"><div class="knob"><label for="kE">ganho K <output id="okE"></output></label><input type="range" id="kE" min="0.5" max="20" step="0.1" value="4"></div></div>
+<div class="read" id="rE"></div>
+</div>
+</div></section>
+
+<section class="band" id="pid"><div class="wrap grid rev">
+<div class="scope">
+<div class="row" id="pidPresets"></div>
+<div class="fig" style="margin-top:8px"><canvas id="cP"></canvas></div>
+<div class="legend"><span><i style="background:var(--blue)"></i>saída y(t)</span><span><i style="background:var(--mute)"></i>referência</span><span><i style="background:var(--green)"></i>parcela P</span><span><i style="background:var(--amber)"></i>parcela I</span><span><i style="background:var(--red)"></i>parcela D</span></div>
+<div class="knobs">
+<div class="knob"><label for="kp">K<sub>p</sub> proporcional <output id="okp"></output></label><input type="range" id="kp" min="0" max="30" step="0.1" value="8"></div>
+<div class="knob"><label for="ki">K<sub>i</sub> integral <output id="oki"></output></label><input type="range" id="ki" min="0" max="20" step="0.1" value="0"></div>
+<div class="knob"><label for="kd">K<sub>d</sub> derivativo <output id="okd"></output></label><input type="range" id="kd" min="0" max="5" step="0.05" value="0"></div>
+</div>
+<div class="read" id="rP"></div>
+</div>
+<div>
+<h2>PID: o que P, I e D fazem</h2>
+<p>u(t) = K<sub>p</sub>e + K<sub>i</sub>∫e dt + K<sub>d</sub>de/dt, ou C(s) = K<sub>p</sub>(1 + 1/(T<sub>i</sub>s) + T<sub>d</sub>s). Planta de exemplo: 1/[(s+1)(s+2)], a mesma do exercício de Routh do PI.</p>
+<p><b>P, o presente.</b> Empurra proporcional ao erro de agora. Como num chuveiro: quanto mais frio, mais você gira. Sozinho deixa erro, porque precisa de erro para gerar força. Aumentar K<sub>p</sub> acelera e começa a oscilar.</p>
+<p><b>I, o passado.</b> Soma o erro acumulado. Enquanto sobrar erro, ele continua crescendo até zerá-lo. Zera o erro ao degrau, mas deixa mais lento e oscilatório (veja a curva laranja subir até compensar).</p>
+<p><b>D, o futuro.</b> Olha a velocidade do erro e freia antes de passar do alvo. Reduz o sobressinal e a oscilação, mas amplifica ruído.</p>
+<div class="note">Routh deste PI: s³ + 3s² + (2+K<sub>p</sub>)s + K<sub>i</sub> = 0 é estável para 0 &lt; K<sub>i</sub> &lt; 6 + 3K<sub>p</sub>. Suba K<sub>i</sub> além disso e veja a oscilação crescer.</div>
+</div>
+</div></section>
+
+<section class="band" id="onoff"><div class="wrap grid">
+<div>
+<h2>Controlador on-off com histerese</h2>
+<p>O atuador só tem duas posições: liga se o erro passa de +h e desliga se passa de −h. Ex.: geladeira, ferro de passar, aquecedor. O forno do exemplo: 8·dT/dt = −(T − 18) + 14·u, com referência de 25 °C.</p>
+<p>A saída <b>nunca para</b>: oscila em torno da referência. Banda h maior ⇒ menos chaveamentos do relé, mas oscilação maior. O atraso entre relé e ar aumenta a amplitude, porque o forno continua esquentando depois de desligar.</p>
+<p>Não existe FT nem LGR aqui: o on-off não é linear.</p>
+</div>
+<div class="scope">
+<div class="fig short" style="height:270px"><canvas id="cO"></canvas></div>
+<div class="knobs">
+<div class="knob"><label for="hO">histerese h (°C) <output id="ohO"></output></label><input type="range" id="hO" min="0.05" max="2" step="0.05" value="0.5"></div>
+<div class="knob"><label for="dO">atraso (min) <output id="odO"></output></label><input type="range" id="dO" min="0" max="3" step="0.1" value="0.8"></div>
+<div class="knob"><label for="rO">referência (°C) <output id="orO"></output></label><input type="range" id="rO" min="20" max="30" step="0.5" value="25"></div>
+</div>
+<div class="read" id="rO2"></div>
+</div>
+</div></section>
+
+<section class="band" id="ampop"><div class="wrap grid rev">
+<div class="scope">
+<div class="row"><label for="cfgA" class="mono">circuito</label><select id="cfgA"><option value="ninv">não inversor (slide)</option><option value="inv">inversor</option><option value="dif">diferencial = erro × ganho (slide)</option><option value="int">integrador (ação I)</option><option value="der">derivador (ação D)</option></select></div>
+<div class="fig short" style="height:190px;margin-top:8px"><canvas id="cAc"></canvas></div>
+<div class="fig short" style="height:220px"><canvas id="cAw"></canvas></div>
+<div class="knobs">
+<div class="knob"><label for="aR">R (realimentação) kΩ <output id="oaR"></output></label><input type="range" id="aR" min="1" max="100" step="1" value="20"></div>
+<div class="knob"><label for="aR1">R<sub>1</sub> kΩ <output id="oaR1"></output></label><input type="range" id="aR1" min="1" max="100" step="1" value="10"></div>
+<div class="knob"><label for="aF">frequência da entrada (Hz) <output id="oaF"></output></label><input type="range" id="aF" min="5" max="200" step="5" value="50"></div>
+</div>
+<div class="read" id="rA"></div>
+</div>
+<div>
+<h2>Amplificador operacional: como o controle vira circuito</h2>
+<p>Amp-op ideal: ganho enorme, não puxa corrente nas entradas e, realimentado, mantém <b>V<sub>+</sub> = V<sub>−</sub></b> (curto-circuito virtual). Com essas regras dá para montar todas as ações de controle com resistores e capacitores.</p>
+<p><b>Não inversor</b> (slide): v<sub>c</sub> = (1 + R/R<sub>1</sub>)·v<sub>E</sub>. <b>Inversor</b>: v<sub>c</sub> = −(R/R<sub>1</sub>)·v<sub>E</sub>. <b>Diferencial</b> (slide): v<sub>c</sub> = (R/R<sub>1</sub>)(v<sub>R</sub> − v<sub>Y</sub>). Ele faz o somador da malha (referência − medida) e já multiplica pelo ganho: é um <b>controlador P completo</b>, com K<sub>p</sub> = R/R<sub>1</sub> ajustado no potenciômetro.</p>
+<p><b>Integrador</b>: capacitor na realimentação ⇒ v<sub>c</sub> = −(1/RC)∫v<sub>E</sub>dt (ação I, 1/s). <b>Derivador</b>: capacitor na entrada ⇒ v<sub>c</sub> = −RC·dv<sub>E</sub>/dt (ação D, s). Repare na fase: o integrador atrasa 90° e o derivador adianta 90°. É exatamente o "atraso" e o "avanço" de fase.</p>
+</div>
+</div></section>
+
+<section class="band" id="comp"><div class="wrap grid">
+<div>
+<h2>Avanço e atraso de fase</h2>
+<p>G<sub>c</sub>(s) = K<sub>c</sub>(s + z)/(s + p). <b>Zero mais perto da origem que o polo</b> (z &lt; p): avanço. Adiciona ângulo positivo, puxa o LGR para a esquerda e deixa o sistema mais rápido e estável. <b>Polo mais perto da origem</b> (p &lt; z): atraso. Quase não mexe no LGR, mas multiplica o ganho de baixa frequência por z/p e reduz o erro.</p>
+<p>Planta: 4/[s(s+2)]. O ponto verde é o polo desejado s<sub>d</sub> = −2 + j3,46 (ζ = 0,5, ω<sub>n</sub> = 4). Mexa em z e p até a soma de ângulos dar 180° no ponto: é o projeto por deficiência angular. Resposta do exemplo: z = 2 e p = 4.</p>
+</div>
+<div class="scope">
+<div class="grid" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px">
+<div class="fig short" style="height:270px"><canvas id="cCl"></canvas></div>
+<div class="fig short" style="height:270px"><canvas id="cCb"></canvas></div>
+</div>
+<div class="knobs">
+<div class="knob"><label for="zC">zero z <output id="ozC"></output></label><input type="range" id="zC" min="0.05" max="8" step="0.05" value="2"></div>
+<div class="knob"><label for="pC">polo p <output id="opC"></output></label><input type="range" id="pC" min="0.05" max="12" step="0.05" value="4"></div>
+</div>
+<div class="read" id="rC"></div>
+</div>
+</div></section>
+
+<section class="band" id="lgr"><div class="wrap">
+<h2>Simulador de lugar das raízes, passo a passo</h2>
+<p>Digite os polos e zeros da FTMA (separados por vírgula; complexos como <code>-2+3j</code>, que o conjugado é incluído automaticamente) ou escolha um exemplo das suas listas. Avance pelos passos da apostila. Clique em qualquer ponto do plano para testar a condição de ângulo e calcular o K naquele ponto.</p>
+<div class="grid rev" style="margin-top:12px">
+<div class="scope">
+<div class="row"><select id="lPreset" aria-label="Exemplos"></select></div>
+<div class="row" style="margin-top:8px"><label for="lP" class="mono">polos</label><input type="text" id="lP" style="flex:1"><label for="lZ" class="mono">zeros</label><input type="text" id="lZ" style="flex:1"><button id="lGo">Aplicar</button></div>
+<div class="fig tall" style="margin-top:8px"><canvas id="cL"></canvas></div>
+<div class="knobs"><div class="knob"><label for="lK">K (passo 7) <output id="olK"></output></label><input type="range" id="lK" min="0" max="1" step="0.001" value="0.3"></div></div>
+</div>
+<div>
+<div class="steps" id="lSteps"></div>
+<div class="explain" id="lExp"></div>
+<h3>Ponto clicado</h3>
+<div class="explain mono" id="lClick" style="min-height:70px">Clique no plano para ver ∠G, K e ζ do ponto.</div>
+<h3>Routh para o K atual</h3>
+<div class="scroll" id="lRouth"></div>
+</div>
+</div>
+</div></section>
+
+<footer><div class="wrap">Guia de estudo de Teoria de Controle (UFOP). Exemplos das aulas e listas do João Antônio. Simulações numéricas feitas no próprio navegador (Runge-Kutta 4 e raízes por Durand-Kerner).</div></footer>
+
+<script>
+{
+/* ---------- complex & polynomial helpers ---------- */
+const C=(re,im=0)=>({re,im});
+const cadd=(a,b)=>C(a.re+b.re,a.im+b.im),csub=(a,b)=>C(a.re-b.re,a.im-b.im);
+const cmul=(a,b)=>C(a.re*b.re-a.im*b.im,a.re*b.im+a.im*b.re);
+const cdiv=(a,b)=>{const d=b.re*b.re+b.im*b.im;return C((a.re*b.re+a.im*b.im)/d,(a.im*b.re-a.re*b.im)/d)};
+const cabs=a=>Math.hypot(a.re,a.im),carg=a=>Math.atan2(a.im,a.re);
+const pmul=(a,b)=>{const r=new Array(a.length+b.length-1).fill(0);a.forEach((x,i)=>b.forEach((y,j)=>r[i+j]+=x*y));return r};
+const padd=(a,b)=>{const n=Math.max(a.length,b.length),r=[];for(let i=0;i<n;i++){r.push((a[i-(n-a.length)]||0)+(b[i-(n-b.length)]||0))}return r};
+const pscale=(a,k)=>a.map(x=>x*k);
+const pder=a=>a.slice(0,-1).map((x,i)=>x*(a.length-1-i));
+const pfromRoots=rs=>{let p=[1];for(const r of rs){if(Math.abs(r.im)<1e-12)p=pmul(p,[1,-r.re]);else if(r.im>0)p=pmul(p,[1,-2*r.re,r.re*r.re+r.im*r.im])}return p};
+const pevalC=(p,z)=>p.reduce((acc,c)=>cadd(cmul(acc,z),C(c)),C(0));
+const trim=p=>{let i=0;while(i<p.length-1&&Math.abs(p[i])<1e-14)i++;return p.slice(i)};
+function roots(p){p=trim(p);const n=p.length-1;if(n<1)return[];const a=p.map(x=>x/p[0]);let z=[];for(let i=0;i<n;i++){const ang=2*Math.PI*i/n+.4;z.push(C(Math.cos(ang)*(1+Math.abs(a[n]||1)**(1/n)),Math.sin(ang)*(1+Math.abs(a[n]||1)**(1/n))))}
+ for(let it=0;it<500;it++){let mx=0;for(let i=0;i<n;i++){let num=pevalC(a,z[i]),den=C(1);for(let j=0;j<n;j++)if(j!==i)den=cmul(den,csub(z[i],z[j]));const d=cdiv(num,den);z[i]=csub(z[i],d);mx=Math.max(mx,cabs(d))}if(mx<1e-13)break}
+ return z.map(r=>Math.abs(r.im)<1e-7*Math.max(1,cabs(r))?C(r.re,0):r)}
+const fmt=(x,d=3)=>{if(!isFinite(x))return x>0?'∞':'−∞';const s=Math.abs(x)>=1000?x.toFixed(0):Math.abs(x)>=100?x.toFixed(1):x.toFixed(d);return s.replace('-','−').replace('.',',')};
+const fc=z=>Math.abs(z.im)<1e-9?fmt(z.re):`${fmt(z.re)} ${z.im<0?'−':'+'} j${fmt(Math.abs(z.im))}`;
+const deg=r=>r*180/Math.PI;
+
+/* ---------- simulation: closed loop TF step via controllable canonical form + RK4 ---------- */
+function simTF(num,den,input,T,dt=0.002){num=trim(num);den=trim(den);const n=den.length-1,a0=den[0];const a=den.map(x=>x/a0);let b=new Array(n+1-num.length).fill(0).concat(num.map(x=>x/a0));
+ const D=b[0];const bb=b.slice(1).map((x,i)=>x-D*a[i+1]);let x=new Array(n).fill(0);const out=[],ts=[];
+ const f=(x,u)=>{const dx=new Array(n);for(let i=0;i<n-1;i++)dx[i]=x[i+1];let s=u;for(let i=0;i<n;i++)s-=a[n-i]*x[i];dx[n-1]=s;return dx};
+ const y=(x,u)=>{let s=D*u;for(let i=0;i<n;i++)s+=bb[n-1-i]*x[i];return s};
+ const step=Math.max(1,Math.round((T/dt)/600));
+ for(let k=0,t=0;t<=T+1e-9;k++,t+=dt){const u=input(t);if(k%step===0){ts.push(t);out.push(y(x,u))}
+  const u2=input(t+dt/2),u3=input(t+dt);const k1=f(x,u),k2=f(x.map((v,i)=>v+dt/2*k1[i]),u2),k3=f(x.map((v,i)=>v+dt/2*k2[i]),u2),k4=f(x.map((v,i)=>v+dt*k3[i]),u3);
+  x=x.map((v,i)=>v+dt/6*(k1[i]+2*k2[i]+2*k3[i]+k4[i]));if(!isFinite(x[0])||Math.abs(x[0])>1e9)break}
+ return {t:ts,y:out}}
+function metrics(t,y){const fin=y[y.length-1];let pk=-Infinity,tp=0;y.forEach((v,i)=>{if(v>pk){pk=v;tp=t[i]}});let ts=0;for(let i=y.length-1;i>=0;i--)if(Math.abs(y[i]-fin)>0.02*Math.abs(fin||1)){ts=t[Math.min(i+1,t.length-1)];break}
+ return{fin,os:fin?Math.max(0,(pk-fin)/Math.abs(fin)*100):0,tp,ts}}
+
+/* ---------- canvas plotting ---------- */
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim()||'#888';
+function col(n){const el=document.createElement('span');el.style.color=`var(${n})`;document.body.appendChild(el);const c=getComputedStyle(el).color;el.remove();return c}
+function setup(cv){const r=cv.getBoundingClientRect(),dpr=window.devicePixelRatio||1;cv.width=Math.max(1,r.width*dpr);cv.height=Math.max(1,r.height*dpr);const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);return{g,W:r.width,H:r.height}}
+function Plot(cv,xr,yr,opt={}){const {g,W,H}=setup(cv);const m={l:opt.l??40,r:12,t:12,b:opt.b??26};const X=x=>m.l+(x-xr[0])/(xr[1]-xr[0])*(W-m.l-m.r),Y=y=>H-m.b-(y-yr[0])/(yr[1]-yr[0])*(H-m.t-m.b);
+ const ink=col('--ink'),grid=col('--grid'),mute=col('--mute');g.font='12px Inter, sans-serif';g.fillStyle=mute;g.strokeStyle=grid;g.lineWidth=1;
+ const nice=(a,b,n)=>{const s=(b-a)/n,p=10**Math.floor(Math.log10(s)),k=[1,2,2.5,5,10].find(k=>k*p>=s)*p;const out=[];for(let v=Math.ceil(a/k)*k;v<=b+1e-9;v+=k)out.push(+v.toFixed(10));return out};
+ const nx=W<380?4:7,ny=H<240?4:6;
+ for(const v of nice(xr[0],xr[1],nx)){g.beginPath();g.moveTo(X(v),m.t);g.lineTo(X(v),H-m.b);g.stroke();g.textAlign='center';g.fillText(fmt(v,v%1?1:0),X(v),H-m.b+15)}
+ for(const v of nice(yr[0],yr[1],ny)){g.beginPath();g.moveTo(m.l,Y(v));g.lineTo(W-m.r,Y(v));g.stroke();g.textAlign='right';g.fillText(fmt(v,v%1?1:0),m.l-4,Y(v)+4)}
+ g.strokeStyle=ink;g.lineWidth=1.2;if(yr[0]<0&&yr[1]>0){g.beginPath();g.moveTo(m.l,Y(0));g.lineTo(W-m.r,Y(0));g.stroke()}if(xr[0]<0&&xr[1]>0){g.beginPath();g.moveTo(X(0),m.t);g.lineTo(X(0),H-m.b);g.stroke()}
+ if(opt.xl){g.fillStyle=mute;g.textAlign='right';g.fillText(opt.xl,W-m.r,H-m.b-5)}if(opt.yl){g.textAlign='left';g.fillText(opt.yl,m.l+4,m.t+11)}
+ const api={g,W,H,X,Y,m,xr,yr,
+  line(xs,ys,c,w=2,dash=[]){g.strokeStyle=c;g.lineWidth=w;g.setLineDash(dash);g.beginPath();let pen=false;for(let i=0;i<xs.length;i++){const yy=ys[i];if(!isFinite(yy)){pen=false;continue}const py=Math.max(-1e4,Math.min(1e4,Y(yy)));pen?g.lineTo(X(xs[i]),py):g.moveTo(X(xs[i]),py);pen=true}g.stroke();g.setLineDash([])},
+  cross(x,y,c,s=7){g.strokeStyle=c;g.lineWidth=2.4;g.beginPath();g.moveTo(X(x)-s,Y(y)-s);g.lineTo(X(x)+s,Y(y)+s);g.moveTo(X(x)+s,Y(y)-s);g.lineTo(X(x)-s,Y(y)+s);g.stroke()},
+  circ(x,y,c,r=6,fill=false){g.strokeStyle=c;g.fillStyle=c;g.lineWidth=2.2;g.beginPath();g.arc(X(x),Y(y),r,0,7);fill?g.fill():g.stroke()},
+  text(s,x,y,c,al='left',dy=0){g.font='600 12px Inter, sans-serif';g.textAlign=al;g.lineWidth=4;g.strokeStyle=col('--panel');g.strokeText(s,X(x),Y(y)+dy);g.fillStyle=c;g.fillText(s,X(x),Y(y)+dy)},
+  inv(px,py){return{x:xr[0]+(px-m.l)/(W-m.l-m.r)*(xr[1]-xr[0]),y:yr[0]+(H-m.b-py)/(H-m.t-m.b)*(yr[1]-yr[0])}}};
+ return api}
+const $=id=>document.getElementById(id);
+function bindRange(id,fmtf,cb){const el=$(id),o=$('o'+id);const upd=()=>{if(o)o.textContent=fmtf(+el.value);cb()};el.addEventListener('input',upd);if(o)o.textContent=fmtf(+el.value);return el}
+const readout=(id,items)=>{$(id).innerHTML=items.map(([k,v])=>`<div><b>${v}</b><span>${k}</span></div>`).join('')};
+const redraws=[];const later=f=>{redraws.push(f);return f};
+let rq=0;const resizeObs=new ResizeObserver(()=>{cancelAnimationFrame(rq);rq=requestAnimationFrame(()=>redraws.forEach(f=>f()))});
+
+/* ---------- 1. plano s ---------- */
+const pole={s:0.6,w:2.2};let dragging=false;
+const drawPlane=later(()=>{const p=Plot($('cPlane'),[-4,1.5],[-4,4],{xl:'σ',yl:'jω',l:30});
+ p.g.fillStyle='rgba(232,37,26,.08)';p.g.fillRect(p.X(0),p.m.t,p.X(1.5)-p.X(0),p.H-p.m.t-p.m.b);
+ const sig=-pole.s,wd=pole.w;const red=col('--red');p.line([0,sig],[0,wd],col('--mute'),1,[4,4]);p.cross(sig,wd,red,8);p.cross(sig,-wd,red,6);
+ p.text('arraste',sig,wd,red,'left',-12);
+ const wn=Math.hypot(pole.s,pole.w),z=pole.s/wn;const T=Math.min(30,pole.s>0.05?Math.max(4,6/pole.s):12);
+ const r=simTF([wn*wn],[1,2*pole.s,wn*wn],()=>1,T,T/4000);const q=Plot($('cPlaneResp'),[0,T],[Math.min(-.2,...r.y.filter(isFinite))*1.05,Math.max(2,...r.y.filter(isFinite).map(v=>Math.min(v,6)))],{xl:'t (s)',l:34});
+ q.line([0,T],[1,1],col('--mute'),1,[5,4]);q.line(r.t,r.y,col('--blue'),2.2);
+ const st=pole.s<0?'INSTÁVEL':pole.s<0.02?'marginal':'estável';const M=metrics(r.t,r.y);
+ readout('rPlane',[['σ = ζωn',fmt(-pole.s,2)],['ωd',fmt(pole.w,2)],['ωn',fmt(wn,2)],['ζ',fmt(z,3)],['sobressinal',pole.s>0?fmt(100*Math.exp(-z*Math.PI/Math.sqrt(Math.max(1e-9,1-z*z))),1)+'%':'—'],['ts (2%)',pole.s>0.02?fmt(4/pole.s,2)+' s':'∞'],['situação',st]])});
+{const cv=$('cPlane');const pick=e=>{const r=cv.getBoundingClientRect();const p=Plot(cv,[-4,1.5],[-4,4],{l:30});const v=p.inv(e.clientX-r.left,e.clientY-r.top);pole.s=Math.max(-1.2,Math.min(4,-v.x));pole.w=Math.max(0.05,Math.min(4,Math.abs(v.y)));drawPlane()};
+ cv.addEventListener('pointerdown',e=>{dragging=true;cv.setPointerCapture(e.pointerId);pick(e)});cv.addEventListener('pointermove',e=>{if(dragging)pick(e)});cv.addEventListener('pointerup',()=>dragging=false);
+ cv.tabIndex=0;cv.addEventListener('keydown',e=>{const d=0.1;if(e.key==='ArrowLeft')pole.s+=d;else if(e.key==='ArrowRight')pole.s-=d;else if(e.key==='ArrowUp')pole.w+=d;else if(e.key==='ArrowDown')pole.w=Math.max(.05,pole.w-d);else return;e.preventDefault();drawPlane()})}
+
+/* ---------- 2. segunda ordem ---------- */
+const draw2=later(()=>{const z=+$('z2').value,w=+$('w2').value,T=Math.max(6,Math.min(30,10/w*(z<.2?2:1)));
+ const r=simTF([w*w],[1,2*z*w,w*w],()=>1,T,T/4000),r0=simTF([w*w],[1,2*w,w*w],()=>1,T,T/4000);
+ const p=Plot($('c2'),[0,T],[0,2],{xl:'t (s)'});p.line([0,T],[1,1],col('--mute'),1,[5,4]);p.line(r0.t,r0.y,col('--mute'),1.5);
+ if(z<1){const ts=r.t;p.line(ts,ts.map(t=>1+Math.exp(-z*w*t)/Math.sqrt(1-z*z)),col('--red'),1,[3,3]);p.line(ts,ts.map(t=>1-Math.exp(-z*w*t)/Math.sqrt(1-z*z)),col('--red'),1,[3,3])}
+ p.line(r.t,r.y,col('--blue'),2.6);const M=metrics(r.t,r.y);
+ readout('r2',[['regime',z<1?'subamortecido':z===1?'crítico':'superamortecido'],['polos',z<1?fc(C(-z*w,w*Math.sqrt(1-z*z))):fmt(-z*w+w*Math.sqrt(Math.max(0,z*z-1)),2)+' / '+fmt(-z*w-w*Math.sqrt(Math.max(0,z*z-1)),2)],['sobressinal',fmt(M.os,1)+'%'],['tp',z<1?fmt(Math.PI/(w*Math.sqrt(1-z*z)),2)+' s':'—'],['ts (2%)',fmt(M.ts,2)+' s']])});
+bindRange('z2',v=>fmt(v,2),draw2);bindRange('w2',v=>fmt(v,2),draw2);
+
+/* ---------- 3. primeira ordem ---------- */
+const draw1=later(()=>{const tau=+$('t1').value,K=+$('k1').value,T=Math.max(5,5*tau);const p=Plot($('c1'),[0,T],[0,5.5],{xl:'t (s)'});
+ const ts=[...Array(300)].map((_,i)=>i*T/299);p.line([0,T],[K,K],col('--mute'),1,[5,4]);p.line(ts,ts.map(t=>K*(1-Math.exp(-t/tau))),col('--blue'),2.6);
+ p.circ(tau,K*.632,col('--red'),5,true);p.text(`τ: 63,2%`,tau,K*.632,col('--red'),'left',-10);if(4*tau<T){p.circ(4*tau,K*.982,col('--green'),5,true);p.text('4τ: 98%',4*tau,K*.982,col('--green'),'right',-10)}});
+bindRange('t1',v=>fmt(v,2),draw1);bindRange('k1',v=>fmt(v,1),draw1);
+
+/* ---------- root locus core ---------- */
+function locus(num,den,Kmax,N=700){const out=[];let prev=null;const Ks=[];for(let i=0;i<=N;i++){const u=i/N;Ks.push(Kmax*(u**3))}
+ for(const K of Ks){let r=roots(padd(den,pscale(num,K)));if(prev){const rr=r.slice(),ord=[];for(const p of prev){let bi=0,bd=1e18;rr.forEach((x,j)=>{const d=cabs(csub(p,x));if(d<bd){bd=d;bi=j}});ord.push(rr.splice(bi,1)[0])}r=ord}out.push(r);prev=r}return{Ks,out}}
+function drawLocus(p,L,c,w=2){const n=L.out[0].length;for(let b=0;b<n;b++){p.line(L.out.map(r=>r[b].re),L.out.map(r=>r[b].im),c,w)}}
+function kCrit(num,den,Kmax){const mr=K=>Math.max(...roots(padd(den,pscale(num,K))).map(r=>r.re));if(mr(1e-6)>1e-6)return{K:0};let a=1e-6,b=null;const N=400;for(let i=1;i<=N;i++){const K=Kmax*i/N;if(mr(K)>0){b=K;break}a=K}if(b===null)return null;for(let i=0;i<60;i++){const m=(a+b)/2;mr(m)>0?b=m:a=m}const r=roots(padd(den,pscale(num,a)));return{K:a,w:Math.max(...r.map(x=>Math.abs(x.im)*(Math.abs(x.re)<1e-3?1:0)))}}
+
+/* ---------- 4. ganho K ---------- */
+const plantsK=[{n:'1/[s(s+1)(s+2)] (aula)',num:[1],den:pfromRoots([C(0),C(-1),C(-2)]),Kmax:10,box:[[-3.6,1.2],[-3,3]]},
+ {n:'1/[(s+1)(s+3)(s+5)] (lista)',num:[1],den:pfromRoots([C(-1),C(-3),C(-5)]),Kmax:250,box:[[-9,2],[-6,6]]},
+ {n:'1/[s(s+20)] (controlador P)',num:[1],den:[1,20,0],Kmax:1500,box:[[-25,5],[-35,35]]},
+ {n:'(s+1)/[s(s+2)(s+3)(s+4)]',num:[1,1],den:pfromRoots([C(0),C(-2),C(-3),C(-4)]),Kmax:200,box:[[-6,2],[-6,6]]}];
+$('plantK').innerHTML=plantsK.map((p,i)=>`<option value="${i}">${p.n}</option>`).join('');
+let LK=null;const plK=()=>plantsK[+$('plantK').value];
+const prepK=()=>{const P=plK();LK=locus(P.num,P.den,P.Kmax);const kc=kCrit(P.num,P.den,P.Kmax);P.kc=kc};
+const Kfrom=v=>plK().Kmax*v**3;
+const drawK=later(()=>{if(!LK)prepK();const P=plK(),K=Kfrom(+$('kK').value);const p=Plot($('cKl'),P.box[0],P.box[1],{l:32,xl:'σ',yl:'jω'});drawLocus(p,LK,col('--blue'),1.8);
+ roots(P.den).forEach(r=>p.cross(r.re,r.im,col('--ink'),6));roots(P.num).forEach(r=>p.circ(r.re,r.im,col('--ink'),6));
+ const cl=roots(padd(P.den,pscale(P.num,K)));cl.forEach(r=>p.circ(r.re,r.im,col('--red'),6,true));
+ const den=padd(P.den,pscale(P.num,K)),num=pscale(P.num,K);const stable=Math.max(...cl.map(r=>r.re))<0;const T=stable?Math.min(40,Math.max(6,8/Math.max(.05,-Math.max(...cl.map(r=>r.re))))):20;
+ const r=simTF(num,den,()=>1,T,T/5000);const ys=r.y.map(v=>Math.max(-3,Math.min(3,v)));const q=Plot($('cKs'),[0,T],[Math.min(0,...ys),Math.max(1.4,...ys)],{xl:'t (s)',l:32});q.line([0,T],[1,1],col('--mute'),1,[5,4]);q.line(r.t,ys,col('--blue'),2.2);
+ const kp=P.den[P.den.length-1]===0?Infinity:K*P.num[P.num.length-1]/P.den[P.den.length-1];
+ readout('rK',[['K',fmt(K,3)],['polos de MF',cl.slice().sort((a,b)=>b.re-a.re).slice(0,2).map(fc).join('<br>')],['estabilidade',stable?'estável':'INSTÁVEL'],['K crítico',P.kc&&P.kc.K?fmt(P.kc.K,2):'—'],['erro ao degrau',stable?fmt(isFinite(kp)?1/(1+kp):0,3):'—']])});
+$('plantK').addEventListener('change',()=>{LK=null;$('kK').value=0.25;drawK()});bindRange('kK',v=>fmt(Kfrom(v),2),drawK);
+
+/* ---------- 5. erro ---------- */
+const tiposE=[{num:[1],den:pfromRoots([C(-1),C(-2)])},{num:[1],den:[1,2,0]},{num:[1,.5],den:[1,3,0,0]}];
+const drawE=later(()=>{const t=+$('tipoE').value,e=+$('entE').value,K=+$('kE').value,T=e===0?8:e===1?10:12;const P=tiposE[t];const num=pscale(P.num,K),den=padd(P.den,num);
+ const inp=e===0?(x=>1):e===1?(x=>x):(x=>x*x/2);const r=simTF(num,den,inp,T,0.002);const ref=r.t.map(inp);const ymax=Math.max(...ref)*1.1;
+ const p=Plot($('cE'),[0,T],[0,ymax],{xl:'t (s)',l:36});p.line(r.t,ref,col('--mute'),1.6,[6,4]);p.line(r.t,r.y.map(v=>Math.min(v,ymax*1.5)),col('--blue'),2.4);
+ const er=ref[ref.length-1]-r.y[r.y.length-1];const kp=t===0?K/2:Infinity,kv=t===0?0:t===1?K/2:Infinity,ka=t===2?K*.5/3:0;
+ const th=e===0?(t===0?1/(1+kp):0):e===1?(t===0?Infinity:t===1?1/kv:0):(t<2?Infinity:1/ka);
+ readout('rE',[['tipo',t],['constante',e===0?'Kp = '+fmt(kp,2):e===1?'Kv = '+fmt(kv,2):'Ka = '+fmt(ka,2)],['e(∞) teórico',fmt(th,3)],['erro em t = '+T+' s',fmt(er,3)]])});
+['tipoE','entE'].forEach(i=>$(i).addEventListener('change',drawE));bindRange('kE',v=>fmt(v,1),drawE);
+
+/* ---------- 6. PID ---------- */
+const presets=[['só P',8,0,0],['PI',8,6,0],['PD',8,0,1.5],['PID',10,8,1.5],['K_i instável',2,14,0]];
+$('pidPresets').innerHTML=presets.map((p,i)=>`<button data-i="${i}">${p[0]}</button>`).join('');
+$('pidPresets').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const p=presets[+b.dataset.i];$('kp').value=p[1];$('ki').value=p[2];$('kd').value=p[3];['kp','ki','kd'].forEach(i=>$('o'+i).textContent=fmt(+$(i).value,2));drawP()});
+function simPID(Kp,Ki,Kd,T){const dt=0.001;let x1=0,x2=0,I=0,df=0,eprev=1;const N=30;const out={t:[],y:[],P:[],I:[],D:[]};
+ for(let k=0,t=0;t<=T;k++,t+=dt){const y=x1,e=1-y;df+=dt*N*((e-eprev)/dt-df);if(k===0)df=0;eprev=e;I+=e*dt;const uP=Kp*e,uI=Ki*I,uD=Kd*df,u=uP+uI+uD;
+  if(k%10===0){out.t.push(t);out.y.push(y);out.P.push(uP);out.I.push(uI);out.D.push(uD)}
+  const a1=x2,a2=u-3*x2-2*x1;x1+=dt*a1;x2+=dt*a2;if(Math.abs(x1)>1e6)break}return out}
+const drawP=later(()=>{const Kp=+$('kp').value,Ki=+$('ki').value,Kd=+$('kd').value,T=10;const r=simPID(Kp,Ki,Kd,T);
+ const ys=r.y.map(v=>Math.max(-1,Math.min(2.5,v)));const umax=Math.max(4,...r.P.slice(5),...r.I,...r.D.slice(5).map(Math.abs));
+ const p=Plot($('cP'),[0,T],[-0.3,Math.max(1.6,...ys)],{xl:'t (s)'});p.line([0,T],[1,1],col('--mute'),1,[5,4]);
+ const sc=v=>v/umax*0.9*Math.max(1.6,...ys);p.line(r.t,r.P.map(sc),col('--green'),1.2);p.line(r.t,r.I.map(sc),col('--amber'),1.2);p.line(r.t,r.D.map(sc),col('--red'),1.2);p.line(r.t,ys,col('--blue'),2.8);
+ const M=metrics(r.t,r.y);const st=Ki<6+3*Kp;
+ readout('rP',[['sobressinal',fmt(M.os,1)+'%'],['ts (2%)',M.ts>T-.1?'> 10 s':fmt(M.ts,2)+' s'],['y final',fmt(M.fin,3)],['erro final',fmt(1-M.fin,3)],['Routh',st?'estável':'INSTÁVEL']])});
+['kp','ki','kd'].forEach(i=>bindRange(i,v=>fmt(v,2),drawP));
+
+/* ---------- 7. on-off (animated) ---------- */
+let oT=[],oY=[],oU=[],oState={T:18,on:1,t:0,hist:[]},oRaf=0;
+function resetO(){oState={T:18,on:1,t:0,hist:[]};oT=[];oY=[];oU=[]}
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function stepO(mins){const h=+$('hO').value,del=+$('dO').value,ref=+$('rO').value,dt=0.01;for(let s=0;s<mins/dt;s++){const e=ref-oState.T;if(oState.on&&e<-h)oState.on=0;else if(!oState.on&&e>h)oState.on=1;oState.hist.push(oState.on);const lag=Math.round(del/dt);const ud=oState.hist.length>lag?oState.hist[oState.hist.length-1-lag]:1;oState.T+=dt/8*(-(oState.T-18)+14*ud);oState.t+=dt;if(s%5===0){oT.push(oState.t);oY.push(oState.T);oU.push(oState.on)}}
+ if(oState.hist.length>20000)oState.hist=oState.hist.slice(-1000)}
+const drawO=later(()=>{const h=+$('hO').value,ref=+$('rO').value,W=60;const t0=Math.max(0,oState.t-W);const p=Plot($('cO'),[t0,t0+W],[16,33],{xl:'t (min)',yl:'°C',l:32});
+ p.g.fillStyle='rgba(242,179,61,.25)';p.g.fillRect(p.m.l,p.Y(ref+h),p.W-p.m.l-p.m.r,p.Y(ref-h)-p.Y(ref+h));
+ const i0=oT.findIndex(t=>t>=t0);const ts=oT.slice(Math.max(0,i0)),ys=oY.slice(Math.max(0,i0)),us=oU.slice(Math.max(0,i0));
+ p.g.fillStyle='rgba(29,95,214,.15)';ts.forEach((t,i)=>{if(us[i]&&i<ts.length-1)p.g.fillRect(p.X(t),p.Y(18),p.X(ts[i+1])-p.X(t)+.5,p.Y(16)-p.Y(18))});
+ p.line([t0,t0+W],[ref,ref],col('--ink'),1,[6,4]);p.line(ts,ys,col('--red'),2.4);
+ const last=ys.slice(-Math.round(ys.length/2));const sw=us.slice(-Math.round(us.length/2)).reduce((a,u,i,arr)=>a+(i&&u&&!arr[i-1]?1:0),0);
+ readout('rO2',[['faixa',last.length?fmt(Math.min(...last),1)+' a '+fmt(Math.max(...last),1)+' °C':'—'],['amplitude',last.length?fmt(Math.max(...last)-Math.min(...last),2)+' °C':'—'],['ligações em 30 min',sw],['relé',oState.on?'LIGADO':'desligado']])});
+function loopO(){stepO(0.25);drawO();oRaf=requestAnimationFrame(loopO)}
+['hO','dO','rO'].forEach(i=>bindRange(i,v=>fmt(v,i==='rO'?1:2),()=>{resetO();stepO(60);drawO()}));
+const visO=new IntersectionObserver(es=>{es.forEach(e=>{cancelAnimationFrame(oRaf);if(e.isIntersecting&&!reduce)loopO()})});
+
+/* ---------- 8. amp-op ---------- */
+let aPh=0,aRaf=0;
+function drawCircuit(cfg){const {g,W,H}=setup($('cAc'));const ink=col('--ink'),mute=col('--mute'),red=col('--red');g.strokeStyle=ink;g.fillStyle=ink;g.lineWidth=1.8;g.font='600 13px Inter, sans-serif';
+ const s=Math.min(W/360,H/170),ox=(W-360*s)/2,oy=(H-170*s)/2;const P=(x,y)=>[ox+x*s,oy+y*s];const L=(...pts)=>{g.beginPath();pts.forEach((p,i)=>{const [x,y]=P(...p);i?g.lineTo(x,y):g.moveTo(x,y)});g.stroke()};
+ const T=(t,x,y,c=ink)=>{g.fillStyle=c;g.fillText(t,...P(x,y))};
+ const res=(x1,y1,x2,y2)=>{const n=6,pts=[[x1,y1]];const dx=(x2-x1),dy=(y2-y1),len=Math.hypot(dx,dy),ux=dx/len,uy=dy/len;for(let i=1;i<=n*2;i++){const f=.15+.7*(i-.5)/(n*2);const sg=i%2?1:-1;pts.push([x1+dx*f-uy*6*sg,y1+dy*f+ux*6*sg])}pts.push([x2,y2]);L(...pts)};
+ const cap=(x1,y1,x2,y2)=>{const mx=(x1+x2)/2,my=(y1+y2)/2,h=y1===y2;if(h){L([x1,y1],[mx-4,my]);L([mx+4,my],[x2,y2]);L([mx-4,my-10],[mx-4,my+10]);L([mx+4,my-10],[mx+4,my+10])}else{L([x1,y1],[mx,my-4]);L([mx,my+4],[x2,y2]);L([mx-10,my-4],[mx+10,my-4]);L([mx-10,my+4],[mx+10,my+4])}};
+ const amp=()=>{L([190,60],[190,130],[250,95],[190,60]);T('−',196,82,red);T('+',196,121,red);L([250,95],[340,95]);T('vc',326,86)};
+ const gnd=(x,y)=>{L([x-10,y],[x+10,y]);L([x-6,y+5],[x+6,y+5]);L([x-2,y+10],[x+2,y+10])};
+ if(cfg==='ninv'){L([20,118],[190,118]);T('vE',14,110);L([190,78],[150,78]);res(150,78,70,78);L([70,78],[70,95]);gnd(70,95);T('R1',100,64);L([150,78],[150,30],[175,30]);res(175,30,265,30);L([265,30],[290,30],[290,95]);T('R',212,20)}
+ if(cfg==='inv'||cfg==='int'||cfg==='der'){T('vE',14,70);if(cfg==='der'){L([20,78],[60,78]);cap(60,78,140,78)}else{L([20,78],[60,78]);res(60,78,140,78)}L([140,78],[190,78]);T(cfg==='der'?'C':'R1',92,64);L([150,78],[150,30],[175,30]);if(cfg==='int')cap(175,30,265,30);else res(175,30,265,30);L([265,30],[290,30],[290,95]);T(cfg==='int'?'C':'R',212,20);L([190,118],[170,118],[170,135]);gnd(170,140)}
+ if(cfg==='dif'){T('vY',14,70);L([20,78],[60,78]);res(60,78,140,78);L([140,78],[190,78]);T('R1',92,64);L([150,78],[150,30],[175,30]);res(175,30,265,30);L([265,30],[290,30],[290,95]);T('R',212,20);T('vR',14,126);L([20,118],[60,118]);res(60,118,140,118);L([140,118],[190,118]);T('R1',92,140);L([165,118],[165,122]);res(165,122,165,152);gnd(165,156);T('R',176,142)}
+ amp()}
+const drawA=later(()=>{const cfg=$('cfgA').value,R=+$('aR').value*1e3,R1=+$('aR1').value*1e3,f=+$('aF').value,Cc=1e-6;drawCircuit(cfg);
+ const T=2/f;const ts=[...Array(300)].map((_,i)=>i*T/299);const w=2*Math.PI*f;const vin=ts.map(t=>Math.sin(w*t+aPh));let vout,gain,ph,label;
+ if(cfg==='ninv'){gain=1+R/R1;vout=vin.map(v=>gain*v);ph=0;label=`vc = (1 + R/R1)·vE = ${fmt(gain,2)}·vE`}
+ else if(cfg==='inv'){gain=R/R1;vout=vin.map(v=>-gain*v);ph=180;label=`vc = −(R/R1)·vE = −${fmt(gain,2)}·vE`}
+ else if(cfg==='dif'){gain=R/R1;const vy=ts.map(t=>0.6*Math.sin(w*t+aPh+1));vout=vin.map((v,i)=>gain*(v-vy[i]));ph=null;label=`vc = (R/R1)(vR − vY): controlador P com Kp = ${fmt(gain,2)}`}
+ else if(cfg==='int'){gain=1/(w*R1*Cc);vout=ts.map(t=>gain*Math.cos(w*t+aPh));ph=90;label=`vc = −(1/R1C)∫vE dt ⇒ ganho 1/(ωR1C) = ${fmt(gain,2)}; saída ATRASA 90°`}
+ else {gain=w*R*Cc;vout=ts.map(t=>-gain*Math.cos(w*t+aPh));ph=-90;label=`vc = −RC·dvE/dt ⇒ ganho ωRC = ${fmt(gain,2)}; saída ADIANTA 90°`}
+ const sat=12;vout=vout.map(v=>Math.max(-sat,Math.min(sat,v)));const ym=Math.max(1.3,Math.min(13,Math.max(...vout.map(Math.abs))*1.1));
+ const p=Plot($('cAw'),[0,T*1000],[-ym,ym],{xl:'t (ms)',yl:'V',l:34});p.line(ts.map(t=>t*1000),vin,col('--mute'),1.8);if(cfg==='dif')p.line(ts.map(t=>t*1000),ts.map(t=>0.6*Math.sin(w*t+aPh+1)),col('--amber'),1.4,[4,3]);p.line(ts.map(t=>t*1000),vout,col('--blue'),2.6);
+ readout('rA',[['relação',label],['saturação','±12 V (fonte)']])});
+$('cfgA').addEventListener('change',drawA);['aR','aR1','aF'].forEach(i=>bindRange(i,v=>String(v),drawA));
+const visA=new IntersectionObserver(es=>{es.forEach(e=>{cancelAnimationFrame(aRaf);if(e.isIntersecting&&!reduce){const lp=()=>{aPh+=0.04;drawA();aRaf=requestAnimationFrame(lp)};lp()}})});
+
+/* ---------- 9. avanço/atraso ---------- */
+const sdC=C(-2,2*Math.sqrt(3));
+const drawC=later(()=>{const z=+$('zC').value,pp=+$('pC').value;const num=[4,4*z],den=pmul([1,2,0],[1,pp]);const L=locus(num,den,80,400);
+ const p=Plot($('cCl'),[-9,2],[-6,6],{l:28,xl:'σ',yl:'jω'});drawLocus(p,locus([4],[1,2,0],80,200),col('--mute'),1.2);drawLocus(p,L,col('--blue'),2);
+ [[0,0],[-2,0],[-pp,0]].forEach(([x,y],i)=>p.cross(x,y,i===2?col('--red'):col('--ink'),6));p.circ(-z,0,col('--red'),6);p.circ(sdC.re,sdC.im,col('--green'),6,true);p.circ(sdC.re,-sdC.im,col('--green'),6,true);
+ const angPlant=-deg(carg(sdC))-deg(carg(cadd(sdC,C(2)))),angC=deg(carg(cadd(sdC,C(z))))-deg(carg(cadd(sdC,C(pp))));const tot=angPlant+angC;
+ const Kc=cabs(sdC)*cabs(cadd(sdC,C(2)))*cabs(cadd(sdC,C(pp)))/(4*cabs(cadd(sdC,C(z))));
+ const ws=[...Array(200)].map((_,i)=>10**(-2+3.5*i/199));const ph=ws.map(w=>deg(Math.atan2(w,z)-Math.atan2(w,pp)));
+ const q=Plot($('cCb'),[-2,1.5],[-70,70],{l:34,xl:'log10 ω',yl:'fase (°)'});q.line(ws.map(Math.log10),ph,col(z<pp?'--green':'--amber'),2.6);
+ readout('rC',[['tipo',z<pp?'AVANÇO':z>pp?'ATRASO':'cancelou'],['ângulo do compensador em sd',fmt(angC,1)+'°'],['soma total em sd',fmt(tot,1)+'°'+(Math.abs(Math.abs(tot)-180)<1.5?' ✓':'')],['Kc no ponto',Math.abs(Math.abs(tot)-180)<1.5?fmt(Kc,2):'—'],['ganho em ω→0: z/p',fmt(z/pp,2)]])});
+['zC','pC'].forEach(i=>bindRange(i,v=>fmt(v,2),drawC));
+
+/* ---------- 10. simulador LGR ---------- */
+const lPresets=[['Aula: 1/[s(s+1)(s+2)]','0,-1,-2',''],['Lista: (s+1)/[s(s+2)(s+3)(s+4)]','0,-2,-3,-4','-1'],['Partida: 1/[s(s+1)(s²+4s+13)]','0,-1,-2+3j',''],['Zero com círculo: (s+3)/[s(s+1)]','0,-1','-3'],['Zeros à direita: (s−2)²/[(s−1)(s²+2s+2)]','1,-1+1j','2,2'],['Controlador P: 1/[s(s+20)]','0,-20',''],['Avanço: 4(s+2)/[(s+4)s(s+2)]','0,-2,-4','-2']];
+$('lPreset').innerHTML=lPresets.map((p,i)=>`<option value="${i}">${p[0]}</option>`).join('');
+function parseList(s){const out=[];for(let t of s.split(',').map(x=>x.trim()).filter(Boolean)){t=t.replace(/\s/g,'').replace('i','j');const m=t.match(/^([+-]?[\d.]*)(?:([+-][\d.]*)j)?$/);if(!m){const m2=t.match(/^([+-]?[\d.]*)j$/);if(m2){const im=+(m2[1]==='-'?-1:m2[1]===''||m2[1]==='+'?1:m2[1]);out.push(C(0,Math.abs(im)),C(0,-Math.abs(im)));continue}throw new Error(t)}
+ const re=m[1]===''||m[1]==='+'?0:+m[1];let im=0;if(m[2]!==undefined){im=m[2]==='+'?1:m[2]==='-'?-1:+m[2]}if(im){out.push(C(re,Math.abs(im)),C(re,-Math.abs(im)))}else out.push(C(re))}return out}
+let SL={step:1};const stepNames=['1 polos e zeros','2 eixo real','3 assíntotas','4 saída/chegada','5 eixo jω','6 partida/chegada','7 LGR completo'];
+$('lSteps').innerHTML=stepNames.map((n,i)=>`<button data-s="${i+1}">${n}</button>`).join('');
+function buildL(){try{SL.P=parseList($('lP').value);SL.Z=parseList($('lZ').value)}catch(e){$('lExp').innerHTML=`<p class="neg">Não entendi "${e.message}". Use números como -2, 0, -2+3j.</p>`;return false}
+ SL.den=pfromRoots(SL.P);SL.num=pfromRoots(SL.Z);const n=SL.P.length,m=SL.Z.length;SL.n=n;SL.m=m;
+ const all=[...SL.P,...SL.Z];const xs=all.map(r=>r.re),ys=all.map(r=>Math.abs(r.im));let xmin=Math.min(...xs,0),xmax=Math.max(...xs,0);const span=Math.max(2,xmax-xmin);
+ const yb=Math.max(span*.9,...ys.map(y=>y*1.5));SL.box=[[xmin-span*.6,xmax+span*.5],[-yb,yb]];
+ let Kmax=1;for(let i=0;i<40;i++){const r=roots(padd(SL.den,pscale(SL.num,Kmax)));const far=Math.max(...r.map(z=>Math.max(Math.abs(z.re-(xmin+xmax)/2),Math.abs(z.im))));if(far>span*2.5&&Kmax>1)break;Kmax*=2}
+ SL.Kmax=Math.max(1,Kmax);SL.L=locus(SL.num,SL.den,SL.Kmax,900);SL.kc=kCrit(SL.num,SL.den,SL.Kmax);
+ // real axis segments
+ const reals=[...SL.P,...SL.Z].filter(r=>Math.abs(r.im)<1e-9).map(r=>r.re).sort((a,b)=>b-a);SL.seg=[];const pts=[Infinity,...reals,-Infinity];
+ for(let i=0;i<pts.length-1;i++){const a=pts[i],b=pts[i+1];if(a===b)continue;const mid=isFinite(a)&&isFinite(b)?(a+b)/2:isFinite(a)?a-1:b+1;const cnt=reals.filter(r=>r>mid).length;if(cnt%2===1)SL.seg.push([b,a])}
+ // asymptotes
+ SL.sig=n>m?(SL.P.reduce((s,r)=>s+r.re,0)-SL.Z.reduce((s,r)=>s+r.re,0))/(n-m):null;SL.ang=[];for(let k=0;k<n-m;k++)SL.ang.push(180*(2*k+1)/(n-m));
+ // breakaway
+ const q=padd(pmul(SL.num,pder(SL.den)),pscale(pmul(SL.den,pder(SL.num)),-1));SL.bk=[];if(trim(q).length>1)for(const r of roots(q)){if(Math.abs(r.im)>1e-6)continue;const K=-pevalC(SL.den,r).re/pevalC(SL.num,r).re;if(K>1e-9&&isFinite(K))SL.bk.push({s:r.re,K})}
+ // departure/arrival
+ SL.dep=[];const angTo=(from,others)=>others.reduce((s,o)=>s+deg(carg(csub(from,o))),0);
+ SL.P.forEach((p,i)=>{if(p.im>1e-9){const others=SL.P.filter((_,j)=>j!==i);const th=180+angTo(p,SL.Z)-angTo(p,others);SL.dep.push({p,th:((th+540)%360)-180,tz:angTo(p,SL.Z),tp:angTo(p,others),kind:'partida'})}});
+ SL.Z.forEach((z,i)=>{if(z.im>1e-9){const others=SL.Z.filter((_,j)=>j!==i);const th=180+angTo(z,SL.P)-angTo(z,others);SL.dep.push({p:z,th:((th+540)%360)-180,kind:'chegada'})}});
+ SL.click=null;return true}
+const KL=()=>SL.Kmax*(+$('lK').value)**3;
+const drawL=later(()=>{if(!SL.L)return;const st=SL.step;const p=Plot($('cL'),SL.box[0],SL.box[1],{l:34,xl:'σ',yl:'jω'});const ink=col('--ink'),red=col('--red'),blue=col('--blue'),grn=col('--green'),amb=col('--amber'),mute=col('--mute');
+ if(st>=2)SL.seg.forEach(([a,b])=>{p.line([Math.max(a,SL.box[0][0]),Math.min(b,SL.box[0][1])],[0,0],blue,6)});
+ if(st>=3&&SL.sig!==null){const R=(SL.box[0][1]-SL.box[0][0])*2;SL.ang.forEach(a=>p.line([SL.sig,SL.sig+R*Math.cos(a*Math.PI/180)],[0,R*Math.sin(a*Math.PI/180)],mute,1.2,[6,5]));p.circ(SL.sig,0,mute,5);p.text('σa = '+fmt(SL.sig,2),SL.sig,0,mute,'center',20)}
+ if(st>=4)SL.bk.forEach(b=>{p.circ(b.s,0,amb,6,true);p.text(fmt(b.s,2),b.s,0,amb,'center',-12)});
+ if(st>=5&&SL.kc&&SL.kc.K&&SL.kc.w){p.circ(0,SL.kc.w,red,6,true);p.circ(0,-SL.kc.w,red,6,true);p.text('K = '+fmt(SL.kc.K,2),0,SL.kc.w,red,'left',-10)}
+ if(st>=6)SL.dep.forEach(d=>{const L=(SL.box[1][1]-SL.box[1][0])*.12;const a=d.th*Math.PI/180;p.g.strokeStyle=grn;p.g.lineWidth=2.4;p.g.beginPath();p.g.moveTo(p.X(d.p.re),p.Y(d.p.im));p.g.lineTo(p.X(d.p.re+L*Math.cos(a)),p.Y(d.p.im+L*Math.sin(a)));p.g.stroke();p.text(fmt(d.th,1)+'°',d.p.re+L*Math.cos(a),d.p.im+L*Math.sin(a),grn,'center',-8)});
+ if(st>=7){drawLocus(p,SL.L,blue,2);roots(padd(SL.den,pscale(SL.num,KL()))).forEach(r=>p.circ(r.re,r.im,red,5,true))}
+ SL.P.forEach(r=>p.cross(r.re,r.im,ink,7));SL.Z.forEach(r=>p.circ(r.re,r.im,ink,7));
+ if(SL.click){const c=SL.click;p.circ(c.re,c.im,amb,5,true);[...SL.P,...SL.Z].forEach(o=>p.line([o.re,c.re],[o.im,c.im],amb,.8,[3,3]))}
+ explainL();routhL()});
+function explainL(){const s=SL.step,n=SL.n,m=SL.m;let h='';
+ if(s===1)h=`<p><b>Regras 1 a 4.</b> Polos (×): ${SL.P.map(fc).join('; ')}. Zeros (○): ${m?SL.Z.map(fc).join('; '):'nenhum'}.</p><p>n = ${n} polos ⇒ <b>${n} ramos</b>, simétricos ao eixo real. Começam nos polos (K = 0) e terminam nos zeros (K → ∞). n − m = ${n-m} ${n-m===1?'ramo vai':'ramos vão'} para zeros no infinito.</p><p>FTMA: K·${m?'('+SL.Z.map(z=>'s'+(z.re<=0?'+':'−')+fmt(Math.abs(z.re),2)).join(')(')+')':'1'} / denominador de grau ${n}.</p>`;
+ if(s===2)h=`<p><b>Regra 5.</b> Um ponto do eixo real é LGR se houver um número <b>ímpar</b> de polos + zeros reais à sua direita. Polos complexos não entram na conta, porque se anulam aos pares.</p><p>Trechos: ${SL.seg.map(([a,b])=>`[${isFinite(a)?fmt(a,2):'−∞'}, ${isFinite(b)?fmt(b,2):'∞'}]`).join(', ')||'nenhum'}.</p>`;
+ if(s===3)h=SL.sig===null?`<p><b>Regra 6.</b> n = m: nenhum ramo vai para o infinito, então não há assíntotas.</p>`:`<p><b>Regra 6.</b> θ = 180°(2k+1)/(n−m) ⇒ <b>${SL.ang.map(a=>fmt(a>180?a-360:a,0)+'°').join(', ')}</b>.</p><p>Centroide σ<sub>a</sub> = (Σpolos − Σzeros)/(n − m) = (${fmt(SL.P.reduce((a,r)=>a+r.re,0),2)} − (${fmt(SL.Z.reduce((a,r)=>a+r.re,0),2)}))/${n-m} = <b>${fmt(SL.sig,3)}</b>.</p>`;
+ if(s===4)h=`<p><b>Regra 7.</b> K = −1/G(s) = −D(s)/N(s). Resolva dK/ds = 0, ou seja, N·D′ − D·N′ = 0, e fique com as raízes reais que estão em trechos do LGR (K > 0).</p><p>${SL.bk.length?SL.bk.map(b=>`s = <b>${fmt(b.s,3)}</b> com K = ${fmt(b.K,3)}`).join('<br>'):'Nenhum ponto de saída/chegada no eixo real.'}</p><p>Entre dois polos é ponto de <b>saída</b> (K máximo no trecho); entre dois zeros, de <b>chegada</b> (K mínimo).</p>`;
+ if(s===5)h=SL.kc&&SL.kc.K?`<p><b>Regra 10.</b> Routh-Hurwitz na equação característica D(s) + K·N(s) = 0: o K que zera uma linha é o limite.</p><p>Cruza o eixo jω em <b>K = ${fmt(SL.kc.K,3)}</b>, com ω = <b>${fmt(SL.kc.w,3)} rad/s</b>. Estável para 0 &lt; K &lt; ${fmt(SL.kc.K,2)}: criticamente estável no limite.</p>`:SL.kc&&SL.kc.K===0?`<p><b>Regra 10.</b> Já é instável para K muito pequeno: há polo (ou ramo) no semiplano direito desde o início.</p>`:`<p><b>Regra 10.</b> O LGR não cruza o eixo jω para K &gt; 0 nesta faixa: estável para todo K.</p>`;
+ if(s===6)h=SL.dep.length?SL.dep.map(d=>d.kind==='partida'?`<p><b>Regra 8, partida de ${fc(d.p)}:</b> θ = 180° + Σθ<sub>z</sub> − Σθ<sub>p</sub> = 180° + ${fmt(d.tz,1)}° − ${fmt(d.tp,1)}° ⇒ <b>${fmt(d.th,1)}°</b>.</p>`:`<p><b>Regra 9, chegada em ${fc(d.p)}:</b> <b>${fmt(d.th,1)}°</b>.</p>`).join(''):`<p><b>Regras 8 e 9.</b> Só se aplicam a polos ou zeros complexos, e aqui não há nenhum.</p>`;
+ if(s===7){const K=KL(),r=roots(padd(SL.den,pscale(SL.num,K)));h=`<p><b>LGR completo.</b> Mova o K: os pontos vermelhos são os polos de malha fechada para K = <b>${fmt(K,3)}</b>.</p><p>${r.map(fc).join('<br>')}</p><p>${Math.max(...r.map(x=>x.re))<0?'Estável.':'<span class="neg">Instável</span>.'}</p>`}
+ $('lExp').innerHTML=h;[...$('lSteps').children].forEach((b,i)=>b.classList.toggle('on',i+1===s))}
+function routhL(){const K=KL(),c=padd(SL.den,pscale(SL.num,K));const n=c.length;const cols=Math.ceil(n/2);let rows=[[],[]];c.forEach((v,i)=>rows[i%2].push(v));rows.forEach(r=>{while(r.length<cols)r.push(0)});
+ for(let i=2;i<n;i++){const a=rows[i-2],b=rows[i-1];let p=b[0];if(Math.abs(p)<1e-9)p=1e-9;const r=[];for(let j=0;j<cols-1;j++)r.push((p*a[j+1]-a[0]*b[j+1])/p);r.push(0);rows.push(r)}
+ const ch=rows.slice(0,n).reduce((a,r,i,arr)=>a+(i&&Math.sign(r[0])!==Math.sign(arr[i-1][0])&&Math.abs(r[0])>1e-9&&Math.abs(arr[i-1][0])>1e-9?1:0),0);
+ $('lRouth').innerHTML=`<table><tr><th>K = ${fmt(K,3)}</th>${[...Array(cols)].map((_,j)=>`<th>col ${j+1}</th>`).join('')}</tr>${rows.slice(0,n).map((r,i)=>`<tr><td>s<sup>${n-1-i}</sup></td>${r.map((v,j)=>`<td class="${j===0&&v<0?'neg':''}">${fmt(v,3)}</td>`).join('')}</tr>`).join('')}</table><p class="mono">${ch} troca(s) de sinal na 1ª coluna ⇒ ${ch} polo(s) no semiplano direito.</p>`}
+function loadPreset(i){const p=lPresets[i];$('lP').value=p[1];$('lZ').value=p[2];if(buildL()){SL.step=1;$('lK').value=0.3;$('olK').textContent=fmt(KL(),3);drawL()}}
+$('lPreset').addEventListener('change',e=>loadPreset(+e.target.value));
+$('lGo').addEventListener('click',()=>{if(buildL()){SL.step=1;drawL()}});
+$('lSteps').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;SL.step=+b.dataset.s;drawL()});
+bindRange('lK',v=>SL.Kmax?fmt(SL.Kmax*v**3,3):'',()=>{if(SL.step<7)SL.step=7;drawL()});
+$('cL').addEventListener('click',e=>{const r=$('cL').getBoundingClientRect();const p=Plot($('cL'),SL.box[0],SL.box[1],{l:34});const v=p.inv(e.clientX-r.left,e.clientY-r.top);const s=C(v.x,v.y);SL.click=s;
+ const az=SL.Z.reduce((a,z)=>a+deg(carg(csub(s,z))),0),ap=SL.P.reduce((a,q)=>a+deg(carg(csub(s,q))),0);let tot=az-ap;tot=((tot%360)+540)%360-180;
+ const K=SL.P.reduce((a,q)=>a*cabs(csub(s,q)),1)/SL.Z.reduce((a,z)=>a*cabs(csub(s,z)),1);const on=Math.abs(Math.abs(tot)-180)<3;const zeta=-s.re/cabs(s);
+ $('lClick').innerHTML=`s = ${fc(s)}<br>Σ∠zeros − Σ∠polos = ${fmt(az,1)}° − ${fmt(ap,1)}° ⇒ ${fmt(tot,1)}° ${on?'<b>≈ ±180°: está no LGR</b>':'(não é ±180°: fora do LGR)'}<br>K = Πdist.polos/Πdist.zeros = <b>${fmt(K,3)}</b>${on?'':' (só vale se estiver no LGR)'}<br>ζ = cos θ = ${fmt(zeta,3)}, ωn = ${fmt(cabs(s),3)}`;drawL()});
+
+/* ---------- init ---------- */
+document.querySelectorAll('.knob label').forEach(l=>{const o=l.querySelector('output');const sp=document.createElement('span');[...l.childNodes].filter(n=>n!==o).forEach(n=>sp.appendChild(n));l.insertBefore(sp,o)});
+prepK();loadPreset(0);
+document.querySelectorAll('canvas').forEach(c=>resizeObs.observe(c));
+visO.observe($('cO'));visA.observe($('cAw'));
+stepO(60)
+redraws.forEach(f=>f());
+new MutationObserver(()=>redraws.forEach(f=>f())).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+}
+</script>
+</body>
+</html>
