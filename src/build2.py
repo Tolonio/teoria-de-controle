@@ -118,6 +118,19 @@ CHAP = set(PRE)
 class Doc(BaseDocTemplate):
     def afterFlowable(self, f):
         k = getattr(f, "_key", None)
+        c = self.canv
+        st = getattr(getattr(f, "style", None), "name", "")
+        if k and k not in KEYS:
+            c.bookmarkPage(k)
+        if isinstance(f, Paragraph) and st in (h1.name, h2.name):
+            self._oc = getattr(self, "_oc", 0) + 1
+            nm = k if (k and k not in KEYS) else f"o{self._oc}"
+            if nm != k: c.bookmarkPage(nm)
+            lv = 0 if st == h1.name else 1
+            if lv == 0 or getattr(self, "_has0", False):
+                c.addOutlineEntry(f.getPlainText(), nm if nm != k else k, lv, closed=True)
+                if lv == 0: self._has0 = True
+            c.showOutline()
         if k:
             KEYS.setdefault(k, self.page)
             if k in CHAP: PAGECH.setdefault(self.page, []).append(k)
@@ -141,6 +154,11 @@ def on_page_end(c, d):
     txt = mk(refs)
     c.saveState(); c.setFont("DVI", 8.3); c.setFillColor(colors.HexColor("#7d3c98"))
     c.drawString(2 * cm, A4[1] - 1.05 * cm, txt)
+    x = 2 * cm + pdfmetrics.stringWidth("Revise antes: ", "DVI", 8.3); y = A4[1] - 1.05 * cm
+    for i, r in enumerate(refs):
+        seg = f"{LABEL[r]} p. {PREV[r]}"; w = pdfmetrics.stringWidth(seg, "DVI", 8.3)
+        c.linkRect("", r, (x, y - 2, x + w, y + 8.5), relative=0, thickness=0)
+        x += w + pdfmetrics.stringWidth("  ·  ", "DVI", 8.3)
     c.setStrokeColor(colors.HexColor("#e3d7f0")); c.line(2 * cm, A4[1] - 1.25 * cm, A4[0] - 2 * cm, A4[1] - 1.25 * cm); c.restoreState()
 
 def make(path):
@@ -171,7 +189,7 @@ def story():
            ("form", "15. Formulário de bolso e MATLAB")]
     for key, t in TOC:
         pg = PREV.get(key, "")
-        S.append(Table([[Paragraph(t, ParagraphStyle("su", parent=body, fontSize=10, leading=12.5, spaceAfter=0)), Paragraph(str(pg), ParagraphStyle("sp", parent=body, alignment=2, spaceAfter=0))]],
+        S.append(Table([[Paragraph(f'<a href="#{key}" color="#1f3a68">{t}</a>', ParagraphStyle("su", parent=body, fontSize=10, leading=12.5, spaceAfter=0)), Paragraph(f'<a href="#{key}" color="#1f3a68">{pg}</a>', ParagraphStyle("sp", parent=body, alignment=2, spaceAfter=0))]],
                        colWidths=[15 * cm, 1.4 * cm], style=TableStyle([("LINEBELOW", (0, 0), (-1, -1), .3, colors.HexColor("#ccd")), ("TOPPADDING", (0, 0), (-1, -1), 1.5), ("BOTTOMPADDING", (0, 0), (-1, -1), 1.5)])))
     # ================= 0 =================
     S += [Spacer(1, 10), H1("0. Como encarar a matéria (o mapa)", "mapa"),
