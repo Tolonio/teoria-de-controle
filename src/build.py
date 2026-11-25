@@ -168,6 +168,10 @@ S += table([["Ação", "Z<sub>i</sub> (entrada)", "Z<sub>f</sub> (realimentaçã
            [2.6, 2.6, 3.4, 4.6, 3.2])
 S += [P("O sinal \"−\" do inversor é desfeito colocando um segundo inversor de ganho −1 em série (por isso os circuitos de compensador do Ogata usam dois amp-ops). "
         "Repare na fase: o integrador (1/s) <b>atrasa 90°</b> e o derivador (s) <b>adianta 90°</b>. É de onde vêm os nomes atraso e avanço de fase (seção 6).")]
+S += box("O que é um PI?", ["<b>PI = controlador proporcional-integral.</b> A parte <b>P</b> reage ao erro de agora (erro grande dá ação grande). "
+         "A parte <b>I</b> soma o erro ao longo do tempo: enquanto sobrar qualquer erro, a ação cresce, até o erro chegar a <b>zero</b>. "
+         "Fórmula: u = K<sub>p</sub>·e + K<sub>i</sub>∫e dt, ou G(s) = K<sub>p</sub>(1 + 1/(T<sub>i</sub>s)), com K<sub>i</sub> = K<sub>p</sub>/T<sub>i</sub>. "
+         "No circuito, o resistor R<sub>2</sub> faz a parte P e o capacitor (que acumula carga, ou seja, integra a corrente) faz a parte I. Detalhes no capítulo 7."], "#eef4fb", "#2e6da4")
 S += exemplo("Exemplo – montar um PI com K<sub>p</sub> = 2 e T<sub>i</sub> = 0,5 s",
              P("Escolha C = 1 µF. De T<sub>i</sub> = R<sub>2</sub>C: R<sub>2</sub> = 0,5/10<super>−6</super> = <b>500 kΩ</b>. De K<sub>p</sub> = R<sub>2</sub>/R<sub>1</sub>: R<sub>1</sub> = 500k/2 = <b>250 kΩ</b>. "
                "Resultado: V<sub>o</sub>/V<sub>i</sub> = −2(1 + 1/(0,5s)) = −(2 + 4/s), ou seja, K<sub>p</sub> = 2 e K<sub>i</sub> = 4. Um inversor de ganho −1 depois corrige o sinal."),
@@ -213,6 +217,8 @@ S += [P("<b>Sinais de teste</b> (amplitude A): degrau A/s, rampa At → <b>A/s²
       P("Resistor R em série e capacitor C na saída. Pela malha: e<sub>i</sub> = Ri + e<sub>o</sub> e i = C de<sub>o</sub>/dt. Aplicando Laplace:"),
       eq(r"E_i(s)=RCs\,E_o(s)+E_o(s)\;\Rightarrow\;\frac{E_o(s)}{E_i(s)}=\frac{1}{RCs+1}=\frac{1}{\tau s+1},\quad \tau=RC"),
       P("Tem um <b>polo</b> em s = −1/τ. A resposta ao degrau é 1 − e<super>−t/τ</super>: chega a 63,2% em t = τ e a 98% em 4τ."),
+      P("<b>Legenda:</b> <b>E<sub>i</sub></b> = tensão de <b>entrada</b> (<i>input</i>), aplicada no resistor; <b>E<sub>o</sub></b> = tensão de <b>saída</b> (<i>output</i>), medida no capacitor; "
+        "<b>i</b> = corrente do circuito. Minúscula (e<sub>i</sub>, e<sub>o</sub>) é o sinal no tempo; maiúscula (E<sub>i</sub>(s), E<sub>o</sub>(s)) é o mesmo sinal depois de aplicar Laplace."),
       fig("primeira_ordem", 11, "Figura 1 – Resposta ao degrau de um sistema de 1ª ordem."),
       Paragraph("1.2 Exemplo: massa-mola-amortecedor (2ª ordem)", h2),
       fig("massa_mola", 9, "Figura 0 – Massa m presa a uma mola k e a um amortecedor b, puxada pela força F(t)."),
