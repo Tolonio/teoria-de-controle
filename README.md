@@ -10,7 +10,7 @@ Material de estudo de Teoria de Controle (Engenharia de Controle e Automação, 
 
 | Arquivo / pasta | O que é |
 |---|---|
-| [`Teoria_de_Controle_Guia_de_Estudo.pdf`](Teoria_de_Controle_Guia_de_Estudo.pdf) | Guia para imprimir (62 páginas), começando direto pelo mapa da matéria. No topo de cada página há uma linha "Revise antes" com as páginas onde estão os conceitos que ela usa. |
+| [`Teoria_de_Controle_Guia_de_Estudo.pdf`](Teoria_de_Controle_Guia_de_Estudo.pdf) | Guia para imprimir (72 páginas), começando direto pelo mapa da matéria. No topo de cada página há uma linha "Revise antes" com as páginas onde estão os conceitos que ela usa. |
 | [`docs/index.html`](docs/index.html) | Site interativo: cada conceito vira botões e curvas ao vivo, mais o simulador de lugar das raízes passo a passo. |
 | [`figuras/`](figuras) | Todas as figuras do guia em PNG (lista abaixo). |
 | [`src/`](src) | Scripts Python que fazem as contas, geram as figuras e montam o PDF. |
@@ -19,25 +19,25 @@ Material de estudo de Teoria de Controle (Engenharia de Controle e Automação, 
 
 | Pág. | Capítulo | O que explica |
 |---:|---|---|
-| 1 | 0. Como encarar a matéria | O mapa: modelar → fechar a malha → analisar → precisão → ajustar K → compensar |
-| 2 | A. Malha aberta e malha fechada | Controle "cego" × controle com sensor, exemplos do dia a dia (torradeira, termostato, boia, piloto automático, buck com feedback), papel de cada bloco, exemplo numérico do motor com carga, sensibilidade, quando usar cada uma |
-| 6 | B. Impedância | Z = V/I, resistor, capacitor (1/sC) e indutor (sL), comportamento em baixa e alta frequência, defasagens, série/paralelo/divisor, funções de transferência de filtros RC |
-| 8 | C. Amplificador operacional | Regras de ouro (i = 0, v₊ = v₋), fórmula −Zf/Zi, inversor, não inversor, diferencial (= controlador P), integrador, derivador, PI, PD, avanço/atraso com amp-op |
-| 10 | 1. Laplace, FT e diagramas de blocos | Transformada de Laplace, tabela, EDO em 4 passos, resposta ao impulso, RC, massa-mola, tanque, barco, FTMA/FTMF, redução de blocos, Mason, sensibilidade |
-| 15 | 2. Polos, zeros e resposta | Plano s, 1ª e 2ª ordem, ζ, ωn, ωd, sobressinal, tempos, polos dominantes, glossário do que cada coisa representa |
-| 19 | 3. Estabilidade e instabilidade | Estável, marginal, instável; por que é o sinal da parte real; onde e por que fica instável; Routh-Hurwitz com casos especiais |
-| 21 | 4. Erro em regime | Tipo do sistema, Kp, Kv, Ka, tabela de erros |
-| 23 | 5. Lugar das raízes | LGR básico (como polos e zeros moldam a curva), as regras da apostila, exemplo completo da aula |
-| 27 | 6. Como achar o K | Condição de módulo, Routh, K pelo erro, K no ponto de saída |
-| 28 | 7. Controladores | PD (slide), família completa (P, I, PI, PD, PID, PI-D, cascata, feedforward…), PID com exemplos de P, I e D, on-off com histerese |
-| 34 | 8. Avanço e atraso de fase | Origem no capacitor, rede RC, projeto por deficiência angular, atraso da aula (Kc = 0,975) |
-| 40 | 9. Acionamentos elétricos | Modelo do motor CC, controle P × PI, cascata corrente/velocidade, buck e PWM, o que cada polo implica |
-| 43 | 10. Resposta em frequência e Nyquist | Z = N + P, por que o −1, margens de ganho e de fase |
-| 45 | 11. Espaço de estados | Da EDO para (A, B, C, D), polos = autovalores, alocação de polos, controlabilidade, observador, LQR |
-| 47 | 12. Controle digital e transformada Z | Definição, estabilidade no círculo unitário, discretização com ZOH, PID no Arduino |
-| 49 | 13. Exercícios resolvidos | Aula e listas, cada um com o quadro "Polos e zeros nesta questão" |
-| 61 | 14. Exercícios propostos | Com gabarito |
-| 62 | 15. Formulário e MATLAB | Fórmulas de bolso e comandos usados em aula |
+| 1 | 0. Como encarar a matéria | O mapa da disciplina e a tabela de siglas e símbolos |
+| 3 | A. Malha aberta e malha fechada | Controle "cego" × com sensor, exemplos do dia a dia, papel de cada bloco, exemplo real do Rashid (regulação de 10,55% → 1,16%), realimentação negativa × positiva |
+| 7 | B. Impedância | Z = V/I, resistor, capacitor (1/sC) e indutor (sL), frequência e defasagem, série/paralelo/divisor, filtros RC |
+| 9 | C. Amplificador operacional | Regras de ouro, −Zf/Zi, inversor, não inversor, diferencial (= controlador P), I, D, PI, PD, avanço/atraso |
+| 11 | 1. Laplace, FT e diagramas de blocos | O que é o s, transformada de Laplace, EDO em 4 passos, impulso e convolução, exemplos físicos, FTMA/FTMF, Mason, sensibilidade |
+| 17 | 2. Polos, zeros e resposta transitória | Plano s, glossário, especificações (td, tr, tp, Mp, ts), 1ª ordem, 2ª ordem (classificação por ζ e fórmulas), ordem superior, polos dominantes, efeito de polos e zeros extras |
+| 24 | 3. Estabilidade e instabilidade | Estável/marginal/instável, por que é a parte real, onde e por que fica instável, Routh-Hurwitz |
+| 26 | 4. Erro em regime | Tipo do sistema, Kp, Kv, Ka |
+| 28 | 5. Lugar das raízes | LGR básico com polos e zeros, regras da apostila, exemplo completo |
+| 32 | 6. Como achar o K | Condição de módulo, Routh, erro, ponto de saída |
+| 33 | 7. Controladores | PD (slide), família completa, PID com exemplos de P, I e D, on-off, alocação de zeros, Ziegler-Nichols (os dois métodos) |
+| 41 | 8. Avanço e atraso de fase | Origem no capacitor, rede RC, deficiência angular, atraso da aula |
+| 47 | 9. Parte de Acionamentos Elétricos | Baseada só no cap. 14 (Acionamentos CC) do Rashid: motor CC, motor série e linearização, conversor como atuador, FT em malha aberta e fechada, Ex. 14.1, 14.8, 14.13 e 14.14 conferidos, cascata corrente/velocidade, ótimo simétrico, mapa conceito × livro |
+| 52 | 10. Bode e Nyquist | O que o Bode representa fisicamente e como ler, Nyquist (Z = N + P), margens |
+| 55 | 11. Espaço de estados | Polos = autovalores, alocação de polos, controlabilidade, observador |
+| 57 | 12. Controle digital e transformada Z | Círculo unitário, ZOH, PID no Arduino |
+| 59 | 13. Exercícios resolvidos | Com o quadro "Polos e zeros nesta questão" |
+| 71 | 14. Exercícios propostos | Com gabarito |
+| 72 | 15. Formulário e MATLAB | Fórmulas de bolso |
 
 ## Site interativo (`docs/index.html`)
 
@@ -57,6 +57,11 @@ Material de estudo de Teoria de Controle (Engenharia de Controle e Automação, 
 |---|---|
 | `malha_ab_fe.png`, `malha_sim.png` | Malha aberta × fechada: diagramas e o motor com carga e desgaste |
 | `impedancia.png` | Impedância de R, L e C × frequência e como número complexo |
+| `realim_positiva.png` | Realimentação positiva × negativa |
+| `resp_transitoria.png`, `ordem_superior.png` | Especificações da resposta transitória e efeito de polos/zeros extras |
+| `bode_motor.png`, `bode_fisico.png` | Bode do motor do Ex. 14.14 e o significado físico (senoides) |
+| `rashid_regulacao.png`, `rashid_velocidade.png` | Ex. 14.13 (regulação) e malha de velocidade do Ex. 14.14 (43,4% → 8,1%) |
+| `zn.png` | Sintonia de Ziegler-Nichols na planta da aula e no motor |
 | `ampop.png` | Amp-op ideal e circuitos de controle (inversor, não inversor, diferencial, PI, avanço/atraso) |
 | `malha.png`, `pid.png` | Diagramas de malha fechada e do PID |
 | `primeira_ordem.png`, `massa_mola.png` | Resposta de 1ª ordem e o sistema massa-mola-amortecedor |
@@ -80,8 +85,10 @@ Precisa de Python 3 com numpy, scipy, matplotlib e reportlab, e das fontes DejaV
 
 ```bash
 cd src
-python3 figs.py && python3 figs2.py && python3 figs3.py && python3 figs4.py && python3 figs5.py   # figuras
+python3 figs.py && python3 figs2.py && python3 figs3.py && python3 figs4.py && python3 figs5.py && python3 figs6.py   # figuras
 python3 assemble.py && python3 build2.py                                      # PDF (duas passagens para numerar páginas)
 ```
 
-`calc*.py` são as conferências numéricas dos exemplos (polos, K, compensadores).
+`calc*.py` são as conferências numéricas dos exemplos (polos, K, compensadores e os exemplos do Rashid em `calc5.py`).
+
+A parte de Acionamentos (cap. 9) usa como única base o Capítulo 14 – Acionamentos CC de Rashid, *Eletrônica de Potência*; o livro não está incluído neste repositório.

@@ -1,6 +1,7 @@
 import re
 src = open("build.py", encoding="utf-8").read()
 exec(open("newsecs.py", encoding="utf-8").read())
+exec(open("newsecs2.py", encoding="utf-8").read())
 
 def cut(a, b=None):
     i = src.index(a); j = src.index(b) if b else len(src)
@@ -37,11 +38,11 @@ capa = CAPA_NOVA
 capa += r'''
 S += [Paragraph("Sumário", h2)]
 TOC = [("mapa", "0. Como encarar a matéria (o mapa)"), ("malha", "A. Malha aberta e malha fechada (com exemplos)"), ("imped", "B. Impedância: resistor, capacitor e indutor"), ("ampop", "C. Amplificador operacional: o controle em forma de circuito"),
-       ("ft", "1. Laplace, função de transferência e diagramas de blocos"), ("polos", "2. Polos, zeros e a resposta do sistema"),
+       ("ft", "1. Laplace, função de transferência e diagramas de blocos"), ("polos", "2. Polos, zeros e resposta transitória (1ª, 2ª e ordem superior)"),
        ("estab", "3. Estabilidade e instabilidade"), ("erro", "4. Tipo do sistema e erro em regime permanente"),
-       ("lgr", "5. Lugar das raízes (LGR)"), ("k", "6. Como achar o K"), ("ctrl", "7. Controladores: P, I, D, PD, PI, PID, on-off e outros"),
-       ("comp", "8. Compensadores: avanço e atraso de fase"), ("acion", "9. Acionamentos elétricos: o motor CC"),
-       ("nyq", "10. Resposta em frequência e Nyquist"), ("ss", "11. Espaço de estados"), ("z", "12. Controle digital e transformada Z"),
+       ("lgr", "5. Lugar das raízes (LGR)"), ("k", "6. Como achar o K"), ("ctrl", "7. Controladores: P, I, D, PD, PI, PID, on-off, alocação de zeros, Ziegler-Nichols"),
+       ("comp", "8. Compensadores: avanço e atraso de fase"), ("acion", "9. Parte de Acionamentos Elétricos (Rashid, cap. 14)"),
+       ("nyq", "10. Resposta em frequência: Bode e Nyquist"), ("ss", "11. Espaço de estados"), ("z", "12. Controle digital e transformada Z"),
        ("ex", "13. Exercícios resolvidos (com o que os polos e zeros implicam)"), ("prop", "14. Exercícios propostos (com gabarito)"),
        ("form", "15. Formulário de bolso e MATLAB")]
 for key, t in TOC:
@@ -113,11 +114,11 @@ import json, os
 LABEL = {"mapa": "Mapa", "malha": "Malha aberta/fechada", "imped": "Impedância", "ampop": "Amp-op", "ft": "Laplace e FT", "ftma": "FTMA/FTMF", "polos": "Polos e zeros", "zeta": "ζ e ωn",
          "estab": "Estabilidade", "routh": "Routh", "erro": "Erro em regime", "lgr": "LGR", "lgrb": "LGR básico", "regras": "Regras do LGR",
          "k": "Como achar K", "ctrl": "Controladores", "pid": "PID", "comp": "Avanço/atraso", "acion": "Acionamentos", "nyq": "Nyquist",
-         "ss": "Estados", "z": "Transformada Z", "ex": "Exercícios", "prop": "Propostos", "form": "Formulário"}
-PRE = {"mapa": [], "malha": ["mapa"], "imped": ["malha"], "ampop": ["imped", "malha"], "ft": ["malha", "imped"], "polos": ["ft", "ftma"], "estab": ["polos", "ftma"],
+         "ss": "Estados", "trans": "Resposta transitória", "bode": "Bode", "zn": "Ziegler-Nichols", "z": "Transformada Z", "ex": "Exercícios", "prop": "Propostos", "form": "Formulário"}
+PRE = {"mapa": [], "malha": ["mapa"], "imped": ["malha"], "ampop": ["imped", "malha"], "ft": ["malha", "imped"], "polos": ["ft", "ftma"], "estab": ["polos", "trans", "ftma"],
        "erro": ["ftma", "estab"], "lgr": ["polos", "zeta", "estab", "routh"], "k": ["regras", "routh", "erro"],
-       "ctrl": ["malha", "erro", "lgrb", "regras", "ampop"], "comp": ["ctrl", "regras", "k", "imped", "ampop"], "acion": ["malha", "imped", "ft", "zeta", "pid"],
-       "nyq": ["estab", "routh", "lgr"], "ss": ["ft", "zeta", "polos", "ctrl"], "z": ["ft", "estab", "pid"],
+       "ctrl": ["malha", "trans", "erro", "lgrb", "regras", "ampop"], "comp": ["ctrl", "regras", "k", "imped", "ampop"], "acion": ["malha", "trans", "estab", "ss", "zn", "bode"],
+       "nyq": ["trans", "estab", "routh", "lgr"], "ss": ["ft", "zeta", "polos", "ctrl"], "z": ["ft", "estab", "pid"],
        "ex": ["polos", "estab", "routh", "regras", "k", "pid", "comp"], "prop": ["ex", "regras", "comp"], "form": []}
 CHAP = set(PRE)
 class Doc(BaseDocTemplate):
@@ -156,7 +157,16 @@ def make(path):
     return d
 '''
 
-body_parts = [mapa, MALHA, IMPED, ampop, ft, polos, ESTAB, erro, lgr, kk, ctrl, comp, ACION, NYQ, SS, ZT, ex, prop, form]
+_i = MALHA.index('      Paragraph("A.4 Exemplo numérico: o motor com carga", h2),'); _j = MALHA.index('S += table([["", "Malha aberta", "Malha fechada"],')
+MALHA = MALHA[:_i] + A4_RASHID + MALHA[_j:]
+MALHA = MALHA.replace('S += dica("A pergunta-chave', REALPOS + '\nS += dica("A pergunta-chave')
+mapa = mapa.replace('S += dica("Em toda questão, escreva primeiro a <b>FTMA</b>', SIGLAS + '\nS += dica("Em toda questão, escreva primeiro a <b>FTMA</b>')
+ft = ft.replace('Paragraph("1.0 Transformada de Laplace: a ferramenta", h2),', 'Paragraph("1.0 A variável s e a transformada de Laplace", h2),\n' + S_INTRO)
+_p = polos.rindex("S.append(CondPageBreak(25 * cm))"); polos = polos[:_p] + TRANSIT + "\n" + polos[_p:]
+_p = ctrl.rindex("S.append(CondPageBreak(25 * cm))"); ctrl = ctrl[:_p] + ALOC_ZN + "\n" + ctrl[_p:]
+NYQ2 = NYQ.replace('H1("10. Resposta em frequência e critério de Nyquist", "nyq")', 'H1("10. Resposta em frequência: Bode e Nyquist", "nyq")').replace('      Paragraph("10.1 O critério de Nyquist", h2),', BODE).replace('Paragraph("10.2 Margens de ganho e de fase (estabilidade relativa)", h2)', 'Paragraph("10.3 Margens de ganho e de fase (estabilidade relativa)", h2)')
+assert NYQ2 != NYQ
+body_parts = [mapa, MALHA, IMPED, ampop, ft, polos, ESTAB, erro, lgr, kk, ctrl, comp, ACION_R, NYQ2, SS, ZT, ex, prop, form]
 story_fn = "def story():\n    global S\n    S = []\n" + "\n".join("    " + l for l in (capa + "\n".join(body_parts)).splitlines()) + "\n    return S\n"
 main = r'''
 PAGECH = {}
@@ -170,5 +180,7 @@ for it in range(2):
 print("ok", KEYS)
 '''
 out = head + "\nPZ = " + repr(PZ) + "\n" + build + story_fn + main
+for _a, _b in TEXT_FIX + [("A MF fica estável", "A malha fechada fica estável"), ('P("MF: ', 'P("Malha fechada: '), ('"MF: s<super>2</super> + 80s', '"Malha fechada: s<super>2</super> + 80s')]:
+    out = out.replace(_a, _b)
 open("build2.py", "w", encoding="utf-8").write(out)
 print("written", len(out))

@@ -101,18 +101,18 @@ def H1(text, key):
 def H2k(text, key):
     p = Paragraph(text, h2); p._key = key; return p
 
-PZ = {'Função de transferência e polos': 'Polos −1 e −3, reais e negativos: estável e sem oscilação. O −1 é o <b>dominante</b> (e<super>−t</super> some 3× mais devagar que e<super>−3t</super>) e define t<sub>s</sub> ≈ 4 s. Sem zeros, nenhum efeito extra. Ganho estático 2/3.', 'Tipo e erros': 'Polo na origem ⇒ <b>tipo 1</b>: erro zero ao degrau e finito à rampa. O zero em −2 aumenta K<sub>v</sub> (10·2/5 = 4), acelera a resposta e pode aumentar o sobressinal. Polos de MF −1,52 e −13,5, reais: sem oscilação, com −1,52 dominante.', 'K máximo por Routh': 'Três polos e nenhum zero ⇒ 3 assíntotas (±60°, 180°): dois ramos <b>inevitavelmente</b> cruzam o eixo jω. Por isso existe um K máximo (60). Sem polo na origem ⇒ tipo 0.', 'K para um ζ desejado': 'Dois polos (0 e −4) ⇒ o LGR sai em −2 e sobe na vertical. A parte real fica presa em −2, então t<sub>s</sub> = 2 s para qualquer K complexo e o K só escolhe o ζ. Polo na origem ⇒ tipo 1. Nenhum K instabiliza.', 'Erro ao degrau em sistema tipo 0': 'Sem polo na origem ⇒ tipo 0 ⇒ erro finito ao degrau. Mais K reduz o erro, mas a parte real fica em −2 (t<sub>s</sub> fixo) e ω<sub>d</sub> cresce: mais oscilação.', 'LGR com zero': 'O zero em −3 <b>atrai</b> os ramos: forma o círculo e eles voltam ao eixo real, um indo para o zero e o outro para −∞. Com um zero à esquerda e só 2 polos, o sistema é estável para todo K.', 'Routh de 4ª ordem': 'Polos de MA 0, −3, −1 (duplo), sem zeros ⇒ 4 assíntotas a ±45° e ±135°. O par de ±45° cruza o eixo jω cedo, e o ganho 20 já passou do limite ⇒ 2 polos de MF no semiplano direito.', 'Faixa de K': 'A planta tem um polo de malha aberta no semiplano direito (o termo −3). Só a realimentação com K &gt; 3 o traz para a esquerda; acima de 51 o par complexo atravessa para a direita. A estabilidade existe numa <b>janela</b> de K.', 'LGR passo a passo de K(s+1)': 'O zero −1 fica entre os polos 0 e −2 e prende um ramo no trecho [−1, 0]. Com um zero, 3 assíntotas (em vez de 4) ⇒ K crítico alto (140,8). O polo de MF que vai para o zero −1 tem efeito pequeno (quase cancelado).', 'Zeros no semiplano direito': 'Zero duplo em +2 (fase não mínima) <b>puxa</b> os ramos para a direita, e o polo +1 de malha aberta já é instável. Resultado: nenhum K estabiliza. Seria preciso um compensador que mude polos e zeros, não só o ganho.', 'Ângulo de partida': 'O par −2 ± j3 parte a −142° e curva para as assíntotas de ±135° (fica estável). Quem instabiliza é o ramo saído dos polos 0 e −1, que vai para ±45°. Os polos lentos dominam a estabilidade.', 'Controlador proporcional': 'Polos 0 e −20 ⇒ LGR vertical em σ = −10: a parte real (e o t<sub>s</sub> = 0,4 s) não depende de K; o K só escolhe o ζ (POS). Polo na origem ⇒ tipo 1 (erro à rampa = 20/K).', 'P e depois PID': 'Planta tipo 0 (sem polo em 0) ⇒ o P deixa erro de 16%. O PID adiciona um <b>polo na origem</b> (tipo 1, erro zero) e dois zeros: −3,79 (parte PD, dá o ângulo que puxa o LGR para a esquerda) e −0,235 (parte PI). Esse último forma um <b>dipolo</b> com o polo de MF −0,218 e deixa a cauda lenta.', 'Avanço de fase: 200': 'O zero −10 <b>cancela</b> o polo −10, o que só é seguro porque esse polo é estável e conhecido. O polo novo em −50 é rápido. Os polos de MF dobram de distância à origem com o mesmo ângulo: mesmo ζ, 2× mais rápido. O ganho estático cai e o erro sobe (avanço não cuida de erro).', 'PID para K/(s²+5s+4)': 'Zero do PD em −7 dá +45° para levar o LGR a −4 ± j3. O zero do PI em −0,1 com o polo na origem forma um dipolo: erro zero, mas o polo de MF −0,085 faz a aproximação final ser lenta.'}
+PZ = {'Função de transferência e polos': 'Polos −1 e −3, reais e negativos: estável e sem oscilação. O −1 é o <b>dominante</b> (e<super>−t</super> some 3× mais devagar que e<super>−3t</super>) e define t<sub>s</sub> ≈ 4 s. Sem zeros, nenhum efeito extra. Ganho estático 2/3.', 'Tipo e erros': 'Polo na origem ⇒ <b>tipo 1</b>: erro zero ao degrau e finito à rampa. O zero em −2 aumenta K<sub>v</sub> (10·2/5 = 4), acelera a resposta e pode aumentar o sobressinal. Polos de malha fechada −1,52 e −13,5, reais: sem oscilação, com −1,52 dominante.', 'K máximo por Routh': 'Três polos e nenhum zero ⇒ 3 assíntotas (±60°, 180°): dois ramos <b>inevitavelmente</b> cruzam o eixo jω. Por isso existe um K máximo (60). Sem polo na origem ⇒ tipo 0.', 'K para um ζ desejado': 'Dois polos (0 e −4) ⇒ o LGR sai em −2 e sobe na vertical. A parte real fica presa em −2, então t<sub>s</sub> = 2 s para qualquer K complexo e o K só escolhe o ζ. Polo na origem ⇒ tipo 1. Nenhum K instabiliza.', 'Erro ao degrau em sistema tipo 0': 'Sem polo na origem ⇒ tipo 0 ⇒ erro finito ao degrau. Mais K reduz o erro, mas a parte real fica em −2 (t<sub>s</sub> fixo) e ω<sub>d</sub> cresce: mais oscilação.', 'LGR com zero': 'O zero em −3 <b>atrai</b> os ramos: forma o círculo e eles voltam ao eixo real, um indo para o zero e o outro para −∞. Com um zero à esquerda e só 2 polos, o sistema é estável para todo K.', 'Routh de 4ª ordem': 'Polos de malha aberta 0, −3, −1 (duplo), sem zeros ⇒ 4 assíntotas a ±45° e ±135°. O par de ±45° cruza o eixo jω cedo, e o ganho 20 já passou do limite ⇒ 2 polos de malha fechada no semiplano direito.', 'Faixa de K': 'A planta tem um polo de malha aberta no semiplano direito (o termo −3). Só a realimentação com K &gt; 3 o traz para a esquerda; acima de 51 o par complexo atravessa para a direita. A estabilidade existe numa <b>janela</b> de K.', 'LGR passo a passo de K(s+1)': 'O zero −1 fica entre os polos 0 e −2 e prende um ramo no trecho [−1, 0]. Com um zero, 3 assíntotas (em vez de 4) ⇒ K crítico alto (140,8). O polo de malha fechada que vai para o zero −1 tem efeito pequeno (quase cancelado).', 'Zeros no semiplano direito': 'Zero duplo em +2 (fase não mínima) <b>puxa</b> os ramos para a direita, e o polo +1 de malha aberta já é instável. Resultado: nenhum K estabiliza. Seria preciso um compensador que mude polos e zeros, não só o ganho.', 'Ângulo de partida': 'O par −2 ± j3 parte a −142° e curva para as assíntotas de ±135° (fica estável). Quem instabiliza é o ramo saído dos polos 0 e −1, que vai para ±45°. Os polos lentos dominam a estabilidade.', 'Controlador proporcional': 'Polos 0 e −20 ⇒ LGR vertical em σ = −10: a parte real (e o t<sub>s</sub> = 0,4 s) não depende de K; o K só escolhe o ζ (POS). Polo na origem ⇒ tipo 1 (erro à rampa = 20/K).', 'P e depois PID': 'Planta tipo 0 (sem polo em 0) ⇒ o P deixa erro de 16%. O PID adiciona um <b>polo na origem</b> (tipo 1, erro zero) e dois zeros: −3,79 (parte PD, dá o ângulo que puxa o LGR para a esquerda) e −0,235 (parte PI). Esse último forma um <b>dipolo</b> com o polo de malha fechada −0,218 e deixa a cauda lenta.', 'Avanço de fase: 200': 'O zero −10 <b>cancela</b> o polo −10, o que só é seguro porque esse polo é estável e conhecido. O polo novo em −50 é rápido. Os polos de malha fechada dobram de distância à origem com o mesmo ângulo: mesmo ζ, 2× mais rápido. O ganho estático cai e o erro sobe (avanço não cuida de erro).', 'PID para K/(s²+5s+4)': 'Zero do PD em −7 dá +45° para levar o LGR a −4 ± j3. O zero do PI em −0,1 com o polo na origem forma um dipolo: erro zero, mas o polo de malha fechada −0,085 faz a aproximação final ser lenta.'}
 
 # ================= build (two passes: page numbers for TOC and headers) =================
 import json, os
 LABEL = {"mapa": "Mapa", "malha": "Malha aberta/fechada", "imped": "Impedância", "ampop": "Amp-op", "ft": "Laplace e FT", "ftma": "FTMA/FTMF", "polos": "Polos e zeros", "zeta": "ζ e ωn",
          "estab": "Estabilidade", "routh": "Routh", "erro": "Erro em regime", "lgr": "LGR", "lgrb": "LGR básico", "regras": "Regras do LGR",
          "k": "Como achar K", "ctrl": "Controladores", "pid": "PID", "comp": "Avanço/atraso", "acion": "Acionamentos", "nyq": "Nyquist",
-         "ss": "Estados", "z": "Transformada Z", "ex": "Exercícios", "prop": "Propostos", "form": "Formulário"}
-PRE = {"mapa": [], "malha": ["mapa"], "imped": ["malha"], "ampop": ["imped", "malha"], "ft": ["malha", "imped"], "polos": ["ft", "ftma"], "estab": ["polos", "ftma"],
+         "ss": "Estados", "trans": "Resposta transitória", "bode": "Bode", "zn": "Ziegler-Nichols", "z": "Transformada Z", "ex": "Exercícios", "prop": "Propostos", "form": "Formulário"}
+PRE = {"mapa": [], "malha": ["mapa"], "imped": ["malha"], "ampop": ["imped", "malha"], "ft": ["malha", "imped"], "polos": ["ft", "ftma"], "estab": ["polos", "trans", "ftma"],
        "erro": ["ftma", "estab"], "lgr": ["polos", "zeta", "estab", "routh"], "k": ["regras", "routh", "erro"],
-       "ctrl": ["malha", "erro", "lgrb", "regras", "ampop"], "comp": ["ctrl", "regras", "k", "imped", "ampop"], "acion": ["malha", "imped", "ft", "zeta", "pid"],
-       "nyq": ["estab", "routh", "lgr"], "ss": ["ft", "zeta", "polos", "ctrl"], "z": ["ft", "estab", "pid"],
+       "ctrl": ["malha", "trans", "erro", "lgrb", "regras", "ampop"], "comp": ["ctrl", "regras", "k", "imped", "ampop"], "acion": ["malha", "trans", "estab", "ss", "zn", "bode"],
+       "nyq": ["trans", "estab", "routh", "lgr"], "ss": ["ft", "zeta", "polos", "ctrl"], "z": ["ft", "estab", "pid"],
        "ex": ["polos", "estab", "routh", "regras", "k", "pid", "comp"], "prop": ["ex", "regras", "comp"], "form": []}
 CHAP = set(PRE)
 class Doc(BaseDocTemplate):
@@ -162,11 +162,11 @@ def story():
     
     S += [Paragraph("Sumário", h2)]
     TOC = [("mapa", "0. Como encarar a matéria (o mapa)"), ("malha", "A. Malha aberta e malha fechada (com exemplos)"), ("imped", "B. Impedância: resistor, capacitor e indutor"), ("ampop", "C. Amplificador operacional: o controle em forma de circuito"),
-           ("ft", "1. Laplace, função de transferência e diagramas de blocos"), ("polos", "2. Polos, zeros e a resposta do sistema"),
+           ("ft", "1. Laplace, função de transferência e diagramas de blocos"), ("polos", "2. Polos, zeros e resposta transitória (1ª, 2ª e ordem superior)"),
            ("estab", "3. Estabilidade e instabilidade"), ("erro", "4. Tipo do sistema e erro em regime permanente"),
-           ("lgr", "5. Lugar das raízes (LGR)"), ("k", "6. Como achar o K"), ("ctrl", "7. Controladores: P, I, D, PD, PI, PID, on-off e outros"),
-           ("comp", "8. Compensadores: avanço e atraso de fase"), ("acion", "9. Acionamentos elétricos: o motor CC"),
-           ("nyq", "10. Resposta em frequência e Nyquist"), ("ss", "11. Espaço de estados"), ("z", "12. Controle digital e transformada Z"),
+           ("lgr", "5. Lugar das raízes (LGR)"), ("k", "6. Como achar o K"), ("ctrl", "7. Controladores: P, I, D, PD, PI, PID, on-off, alocação de zeros, Ziegler-Nichols"),
+           ("comp", "8. Compensadores: avanço e atraso de fase"), ("acion", "9. Parte de Acionamentos Elétricos (Rashid, cap. 14)"),
+           ("nyq", "10. Resposta em frequência: Bode e Nyquist"), ("ss", "11. Espaço de estados"), ("z", "12. Controle digital e transformada Z"),
            ("ex", "13. Exercícios resolvidos (com o que os polos e zeros implicam)"), ("prop", "14. Exercícios propostos (com gabarito)"),
            ("form", "15. Formulário de bolso e MATLAB")]
     for key, t in TOC:
@@ -184,6 +184,18 @@ def story():
                 ["5. Ajustar ganho", "Que K deixa como eu quero?", "Lugar das raízes + condição de módulo"],
                 ["6. Compensar", "Só ganho não resolve. E agora?", "Avanço (transitório), atraso (erro), PID"]],
                [3.2, 5.6, 7.6])
+    
+    S += [Paragraph("Siglas e símbolos usados neste guia", h3)]
+    S += table([["Sigla / símbolo", "Significa", "Sigla / símbolo", "Significa"],
+                ["FT", "função de transferência", "s", "frequência complexa σ + jω (seção 1.0)"],
+                ["FTMA", "FT de malha aberta (G·H)", "σ, ω<sub>d</sub>", "parte real (decaimento) e imaginária (oscilação) de um polo"],
+                ["FTMF", "FT de malha fechada G/(1+GH)", "ζ, ω<sub>n</sub>", "amortecimento e frequência natural"],
+                ["LGR", "lugar geométrico das raízes", "K<sub>p</sub>, K<sub>i</sub>, K<sub>d</sub>", "ganhos proporcional, integral, derivativo"],
+                ["EDO", "equação diferencial ordinária", "PID", "proporcional-integral-derivativo"],
+                ["CC / CA", "corrente contínua / alternada", "PWM", "modulação por largura de pulso"],
+                ["fcem", "força contraeletromotriz do motor", "dB", "decibel: 20·log<sub>10</sub>|G|"]], [2.4, 5.6, 2.6, 5.8])
+    S += [P("Sempre que aparecer \"condições iniciais nulas\", leia: o sistema está <b>parado e descarregado</b> no instante zero (capacitor sem carga, motor parado, mola na posição de repouso).")]
+    
     S += dica("Em toda questão, escreva primeiro a <b>FTMA</b> (malha aberta) e a <b>equação característica</b> 1 + FTMA = 0. "
               "Polos de malha fechada = raízes dessa equação. Erro em regime sai da FTMA. O LGR também é desenhado a partir da FTMA. "
               "Ou seja: a FTMA é o ponto de partida de quase tudo.",
@@ -231,23 +243,37 @@ def story():
                 ["Y(s) saída", "o que acontece", "posição real da garra", "temperatura real"]], [3.4, 2.6, 5.0, 5.4])
     S += [P("Cada bloco multiplica o que entra nele. Juntando, chega-se à <b>função de transferência de malha fechada</b>, deduzida com calma no capítulo 1:"),
           eq(r"U=G_aG_c\,E,\quad Y=G_p\,U\ \Rightarrow\ \frac{Y}{E}=G_cG_aG_p=G(s);\qquad E=R-HY\ \Rightarrow\ \frac{Y}{R}=\frac{G}{1+GH}"),
-          Paragraph("A.4 Exemplo numérico: o motor com carga", h2),
-          P("Um motor tem ganho estático de 1,43 (rad/s)/V: cada volt dá 1,43 rad/s em regime. Queremos velocidade 1 (normalizada)."),
+          Paragraph("A.4 Exemplo real (Acionamentos, Rashid Ex. 14.13): o motor com carga", h2),
+          P("Motor CC de 50 kW, 240 V e 1700 rpm, alimentado por conversor de ganho K<sub>2</sub> = 100, com sensor de velocidade de 95 mV/(rad/s) (detalhes no capítulo 9). Torque nominal de 280,9 N·m."),
           ]
-    S += B(["<b>Malha aberta:</b> aplicamos u = 1/1,43 = 0,70 V e pronto. Funciona... até entrar uma carga: a velocidade cai para 0,75 e <b>fica lá</b>. "
-            "Se depois o motor esquenta e perde 20% de ganho, cai para 0,55. O controlador nunca percebe.",
-            "<b>Malha fechada com P (u = 10·e):</b> a velocidade fica em 0,94 (sobra um pequeno erro, típico do P). Com a carga, cai só para 0,92; com o desgaste, para 0,90. "
-            "A realimentação reduziu o efeito das duas perturbações em mais de 10 vezes.",
-            "<b>Malha fechada com PI:</b> a parcela integral continua agindo enquanto existir erro, e a velocidade <b>volta exatamente para 1</b> depois de cada perturbação."])
-    S += [fig("malha_sim", 14.5, "Figura 0 – Mesmo motor nas três estruturas: carga em t = 4 s e perda de 20% de ganho em t = 7 s."),
-          P("<b>Por que isso acontece (sensibilidade):</b> em malha fechada, Y/R = KG/(1 + KG). Se KG é grande, Y/R ≈ 1 <b>qualquer que seja G</b>. A planta pode mudar que o resultado quase não muda. "
-            "Com K = 10 e G = 1,43, Y/R = 14,3/15,3 = 0,935. Se G cai 20% (1,14), Y/R = 11,4/12,4 = 0,920: só 1,6% de variação, contra 20% em malha aberta.")]
+    S += B(["<b>Malha aberta:</b> regula-se a tensão para 1700 rpm a vazio. Ao entrar o torque nominal, a velocidade cai 17 rad/s, para <b>1537,7 rpm</b>. A regulação é de <b>10,55%</b>, e o controlador nunca percebe.",
+            "<b>Malha fechada</b> (a medida da velocidade é comparada com a referência): com a mesma carga, a velocidade cai só 2 rad/s, para <b>1680,5 rpm</b>. A regulação é de <b>1,16%</b>.",
+            "<b>Por quê?</b> A queda de velocidade fica dividida por (1 + ganho de malha). Aqui, o termo K<sub>1</sub>K<sub>2</sub>K<sub>v</sub>I<sub>f</sub> = 12,1 é somado ao denominador original 1,65: "
+            "(1,65 + 12,1)/1,65 ≈ 8,3 vezes menos queda. É a <b>sensibilidade</b> reduzida pela realimentação."])
+    S += [fig("rashid_regulacao", 13, "Figura 0 – Velocidade × torque de carga no Exemplo 14.13: a realimentação deixa a reta quase horizontal."),
+          P("Note que mesmo em malha fechada sobra uma pequena queda. Esse controlador é só proporcional e o motor é tipo 0 (capítulo 4). Com um PI, a queda iria a zero. É por isso que os acionamentos reais usam PI (capítulo 9).")]
     S += table([["", "Malha aberta", "Malha fechada"],
                 ["Precisa de sensor?", "não (mais barato e simples)", "sim"],
                 ["Corrige perturbações e desgaste?", "não", "sim"],
                 ["Precisão", "depende de conhecer bem a planta", "depende de um bom sensor"],
                 ["Pode ficar instável?", "não, se a planta for estável", "<b>sim</b>: ganho demais faz oscilar (capítulo 3)"],
                 ["Quando usar", "processo previsível, sem perturbação, erro tolerável", "precisão, perturbações, planta que muda ou instável"]], [4.4, 5.8, 6.2])
+    
+    S += [Paragraph("A.5 Realimentação negativa × realimentação positiva", h2),
+          P("Na realimentação <b>negativa</b>, a medida entra <b>subtraindo</b> no somador: e = r − y. Se a saída passa do alvo, o erro fica negativo e a ação diminui, então o sistema se <b>autocorrige</b>. "
+            "Na realimentação <b>positiva</b>, a medida entra <b>somando</b>: o sinal de volta reforça o próprio desvio, e um pequeno aumento gera mais aumento, numa \"bola de neve\"."),
+          eq(r"\mathrm{negativa:}\ \frac{Y}{R}=\frac{G}{1+GH}\qquad\qquad \mathrm{positiva:}\ \frac{Y}{R}=\frac{G}{1-GH}"),
+          P("Com a positiva, a equação característica vira 1 − GH = 0, e os polos são empurrados para a <b>direita</b>. Exemplo com a planta 1/(s+1) e ganho K: na negativa o polo vai para s = −(1 + K), sempre mais estável. "
+            "Na positiva vai para s = K − 1, e <b>passa a ser instável quando K &gt; 1</b>."),
+          fig("realim_positiva", 14, "Figura 0 – A mesma planta com realimentação positiva (polo andando para a direita) e negativa (polo andando para a esquerda)."),
+          ]
+    S += table([["Realimentação positiva indesejada (instabilidade)", "Realimentação positiva útil (de propósito)"],
+                ["Microfonia: o microfone capta a caixa de som, que amplifica o que o microfone capta, e vem o apito", "Comparador com histerese (Schmitt trigger): base do controlador on-off (seção 7.5)"],
+                ["Corrida térmica: o transistor esquenta, conduz mais, esquenta mais e queima", "Osciladores: o ganho de malha igual a 1 sustenta a oscilação de propósito"],
+                ["Sinal trocado no somador ao montar o circuito: o motor dispara em vez de regular", "Memórias (latch, flip-flop): o circuito \"trava\" num estado"],
+                ["A máquina com zero em +2 (seção 2): a correção passa a ajudar o erro", "Partida rápida de um dispositivo que precisa ir de um extremo ao outro"]], [8.2, 8.2])
+    S += [P("No motor CC (capítulo 9), a <b>fcem</b> é uma realimentação negativa natural: velocidade maior gera fcem maior, que reduz a corrente e o torque. É ela que torna o motor estável em malha aberta (Rashid, Eq. 14.60).")]
+    
     S += dica("A pergunta-chave para classificar: <b>a saída é medida e comparada com a referência?</b> Se sim, é malha fechada; se não, é aberta. "
               "Um timer, por mais \"inteligente\" que seja, é malha aberta.")
     S.append(CondPageBreak(25 * cm))
@@ -338,7 +364,15 @@ def story():
           eq(r"G_p(s)=\frac{b_0s^m+b_1s^{m-1}+\dots+b_{m-1}s+b_m}{a_0s^n+a_1s^{n-1}+\dots+a_{n-1}s+a_n}"),
           P("O grau n do denominador é a <b>ordem</b> do sistema (o número da maior derivada da EDO). Em sistemas físicos, n ≥ m (sistema <i>próprio</i>). "
             "As raízes de Q(s) (denominador) são os <b>polos</b>, e as de P(s) (numerador) são os <b>zeros</b>. Se n > m, sobram n − m <b>zeros no infinito</b>."),
-          Paragraph("1.0 Transformada de Laplace: a ferramenta", h2),
+          Paragraph("1.0 A variável s e a transformada de Laplace", h2),
+          Paragraph("O que é o s (frequência complexa)", h3),
+          P("<b>s</b> é uma variável complexa, s = σ + jω, chamada <b>frequência complexa</b>. Ela representa um sinal do tipo e<super>st</super> = e<super>σt</super>·(cos ωt + j·sen ωt): "
+            "a parte real <b>σ</b> diz quanto o sinal cresce (σ &gt; 0) ou decai (σ &lt; 0) por segundo, e a parte imaginária <b>ω</b> diz quão rápido ele oscila (rad/s). "
+            "Por isso a unidade de s é 1/s (o mesmo que rad/s)."),
+          P("A grande vantagem: derivar e<super>st</super> é só multiplicar por s, porque d(e<super>st</super>)/dt = s·e<super>st</super>. Por isso, no mundo de Laplace, <b>derivar vira multiplicar por s</b> e <b>integrar vira dividir por s</b>. "
+            "Quando dizemos que um sistema tem um polo em s = −2, queremos dizer que ele contém um termo e<super>−2t</super> na resposta. Um polo em s = −1 ± j3 dá e<super>−t</super>cos 3t. "
+            "O plano s (eixo horizontal σ, vertical jω) é o \"mapa\" onde desenhamos polos, zeros e o lugar das raízes. Fazendo σ = 0 (s = jω), olhamos só senoides puras, e é isso que o diagrama de Bode faz (capítulo 10)."),
+    
           P("A analogia do seu caderno é ótima. Multiplicar XIV × VII em algarismos romanos é penoso. Você converte para 14 × 7, faz a conta fácil (98) e volta (XCVIII). "
             "Laplace faz isso com equações diferenciais: leva do domínio do tempo t para o domínio da frequência complexa s = σ + jω, onde derivadas e integrais viram multiplicação e divisão por s. "
             "Resolve-se a álgebra e volta-se com a transformada inversa."),
@@ -445,7 +479,7 @@ def story():
                 ["Semiplano direito", "e<super>+at</super>", "Cresce: INSTÁVEL"]], [4.4, 3.8, 8.2])
     S += [P("<b>Estabilidade:</b> o sistema em malha fechada é estável se e somente se <b>todos</b> os polos de malha fechada estiverem no semiplano esquerdo (parte real < 0). "
             "Motivo: cada polo p vira um termo e<super>pt</super>. Com p = −2, e<super>−2t</super> some com o tempo. Com p = +2, e<super>2t</super> cresce sem parar. "
-            "Com K = 0 o controlador está desligado e os polos de MF ficam exatamente em cima dos polos de MA."),
+            "Com K = 0 o controlador está desligado e os polos de malha fechada ficam exatamente em cima dos polos de MA."),
           ]
     S += exemplo("Exemplo das suas notas: a máquina com zero em +2",
                  P("Planta com um polo em −4 (estável) e um zero em +2 (semiplano direito): G(s) = (s − 2)/(s + 4). Fechando a malha com ganho K: "
@@ -498,6 +532,49 @@ def story():
                 ["Ganho estático G(0)", "valor final para degrau unitário", "quanto a saída anda em regime por unidade de entrada"],
                 ["Equação característica", "1 + GH = 0", "suas raízes são os polos de malha fechada"]], [3.6, 4.2, 8.6])
     
+    
+    S += [CondPageBreak(10 * cm), H2k("2.4 Análise de resposta transitória: 1ª ordem, 2ª ordem e ordem superior", "trans"),
+          P("<b>Resposta transitória</b> é a parte da resposta entre o instante em que algo muda (a referência ou uma carga) e o momento em que a saída se acomoda. Depois disso vem o <b>regime permanente</b>. "
+            "Para comparar sistemas, aplica-se um sinal de teste padrão, quase sempre o <b>degrau</b> (mudança súbita de referência), e mede-se:"),
+          fig("resp_transitoria", 14.5, "Figura 0 – As especificações de desempenho no tempo."),
+          ]
+    S += table([["Especificação", "Definição", "O que mede"],
+                ["t<sub>d</sub> atraso", "tempo para chegar a 50% do valor final", "quanto demora para \"reagir\""],
+                ["t<sub>r</sub> subida", "de 10% a 90% (ou de 0 a 100% em sistemas oscilatórios)", "rapidez"],
+                ["t<sub>p</sub> pico", "instante do primeiro pico", "rapidez da oscilação"],
+                ["M<sub>p</sub> sobressinal", "(pico − final)/final × 100%", "quanto passa do alvo (amortecimento)"],
+                ["t<sub>s</sub> acomodação", "tempo para ficar dentro de ±2% (ou ±5%) do final", "quando dá para considerar \"parado\""],
+                ["e<sub>ss</sub> erro em regime", "referência − valor final", "precisão (capítulo 4)"]], [3.4, 7.2, 5.8])
+    S += [Paragraph("Sistemas de 1ª ordem", h3),
+          eq(r"G(s)=\frac{K}{\tau s+1}\qquad y(t)=K\left(1-e^{-t/\tau}\right)\ \ \mathrm{(degrau\ unitario)}"),
+          P("Um único polo em s = −1/τ. <b>K</b> é o ganho estático (onde a saída para) e <b>τ</b> a constante de tempo (quão rápido chega lá). Em t = τ a saída chega a 63,2%; em 3τ, 95%; em 4τ, 98%. "
+            "t<sub>r</sub> ≈ 2,2τ, t<sub>s</sub> ≈ 4τ, e <b>nunca há sobressinal nem oscilação</b>: o polo é real. A inclinação inicial é K/τ. Para entrada rampa, a saída segue com atraso de τ. "
+            "<b>Exemplos:</b> circuito RC (τ = RC), tanque (τ = 1/K), barco (τ = m/B) e, na parte de Acionamentos, o <b>conversor</b> K<sub>r</sub>/(1 + sτ<sub>r</sub>) e o <b>filtro do tacogerador</b> 0,074/(1 + 0,002s) do Rashid."),
+          Paragraph("Sistemas de 2ª ordem", h3),
+          eq(r"G(s)=\frac{\omega_n^2}{s^2+2\zeta\omega_n s+\omega_n^2}\qquad s=-\zeta\omega_n\pm j\omega_n\sqrt{1-\zeta^2}"),
+          ]
+    S += table([["ζ", "Nome", "Polos", "Resposta ao degrau"],
+                ["ζ = 0", "sem amortecimento", "±jω<sub>n</sub> (sobre o eixo jω)", "oscila para sempre na frequência ω<sub>n</sub>"],
+                ["0 &lt; ζ &lt; 1", "subamortecido", "par complexo", "oscila amortecido; tem sobressinal"],
+                ["ζ = 1", "criticamente amortecido", "dois reais iguais", "o mais rápido sem passar do alvo"],
+                ["ζ &gt; 1", "superamortecido", "dois reais distintos", "lento, sem sobressinal (parece 1ª ordem)"]], [2.2, 4, 4.6, 5.6])
+    S += [eq(r"t_r=\frac{\pi-\beta}{\omega_d},\ \ \beta=\arccos\zeta\qquad t_p=\frac{\pi}{\omega_d}\qquad M_p=e^{-\zeta\pi/\sqrt{1-\zeta^2}}\qquad t_s\approx\frac{4}{\zeta\omega_n}\ (2\%)", 13),
+          P("Exemplo da figura acima (ζ = 0,4, ω<sub>n</sub> = 1): ω<sub>d</sub> = 0,917, β = 66,4°, t<sub>r</sub> = 2,16 s, t<sub>p</sub> = 3,43 s, M<sub>p</sub> = 25,4%, t<sub>s</sub> ≈ 10 s pela fórmula (o envelope é conservador; a curva real entra na faixa em ~8,4 s). "
+            "<b>Na parte de Acionamentos:</b> o motor CC é de 2ª ordem (constantes de tempo elétrica τ<sub>a</sub> e mecânica τ<sub>m</sub>) e sempre superamortecido (Rashid, Eq. 14.60). "
+            "A malha de corrente é projetada com ζ = 0,707, ou seja, sobressinal de 4,3% (Rashid, Eq. 14.110)."),
+          Paragraph("Sistemas de ordem superior", h3),
+          P("Com 3 ou mais polos, a resposta é a <b>soma dos modos</b> de cada polo (é isso que as frações parciais mostram). Na prática:"),
+          ]
+    S += B(["<b>Polos dominantes:</b> os mais próximos do eixo jω mandam. Se os outros estão 5 vezes ou mais à esquerda, o sistema se comporta como o 2ª ordem formado pelo par dominante, e as fórmulas acima valem aproximadamente.",
+            "<b>Polo a mais (à esquerda):</b> deixa a resposta mais lenta e com menos sobressinal (atrasa).",
+            "<b>Zero a mais (à esquerda):</b> deixa mais rápida e com <b>mais</b> sobressinal. Quanto mais perto da origem, maior o efeito.",
+            "<b>Zero à direita:</b> a resposta começa indo para o lado errado (undershoot).",
+            "<b>Na parte de Acionamentos:</b> a malha de velocidade otimizada do Rashid é de 3ª ordem com um zero, e por isso tem 43,4% de sobressinal. "
+            "Retirando o efeito do zero com um pré-filtro, cai para 8,1% (capítulo 9). É exatamente o efeito do zero na figura abaixo."])
+    S += [fig("ordem_superior", 14, "Figura 0 – Mesmo par de polos dominantes; muda só um polo ou um zero extra.")]
+    S += dica("Na prova: (1) conte os polos (ordem); (2) ache os dominantes; (3) se forem um par complexo, use as fórmulas de 2ª ordem com ζ e ω<sub>n</sub> dele; "
+              "(4) diga qualitativamente o que os outros polos e zeros fazem (mais lento, mais sobressinal, undershoot).")
+    
     S.append(CondPageBreak(25 * cm))
     
     
@@ -507,7 +584,7 @@ def story():
           P("<b>Estabilidade</b> é a propriedade de, depois de uma perturbação ou de uma mudança de referência, a saída <b>voltar a se acomodar</b> num valor finito. "
             "<b>Instabilidade</b> é o contrário: a saída cresce sem parar (ou até algo físico saturar, quebrar ou desarmar). Um pêndulo pendurado é estável; um lápis em pé na ponta é instável."),
           Paragraph("3.1 As três situações", h2)]
-    S += table([["Situação", "Definição", "Onde estão os polos de MF", "Resposta típica"],
+    S += table([["Situação", "Definição", "Onde estão os polos de malha fechada", "Resposta típica"],
                 ["Estável (assintoticamente)", "a resposta natural vai a zero", "todos com parte real &lt; 0 (semiplano esquerdo)", "acomoda; e<super>−at</super> some"],
                 ["Marginalmente estável", "não cresce, mas não morre", "polos simples sobre o eixo jω (ou em s = 0), nenhum à direita", "oscila para sempre (±jω) ou fica parada/deriva (s = 0)"],
                 ["Instável", "a resposta cresce sem limite", "pelo menos um com parte real &gt; 0, ou polo repetido sobre jω", "e<super>+at</super> ou oscilação crescente"]], [3.3, 3.6, 4.8, 4.7])
@@ -525,7 +602,7 @@ def story():
             "<b>A própria planta instável:</b> polo de malha aberta à direita (pêndulo invertido, levitação, o Exercício 13.8). Aí a realimentação é <b>obrigatória</b> para estabilizar.",
             "<b>Amostragem:</b> no controle digital, o mesmo K que era estável no contínuo pode instabilizar se o período T for grande (seção 12)."])
     S += [Paragraph("3.4 Por que realimentar estabiliza (e por que às vezes desestabiliza)", h2),
-          P("A malha fechada move os polos: 1 + KG = 0. Com K pequeno, os polos de MF ficam perto dos de MA. Aumentando K, eles andam pelo LGR. "
+          P("A malha fechada move os polos: 1 + KG = 0. Com K pequeno, os polos de malha fechada ficam perto dos de malha aberta. Aumentando K, eles andam pelo LGR. "
             "Se a planta tem poucos polos (1 ou 2) e nenhum zero à direita, o LGR nunca cruza o eixo jω e qualquer K é estável. Com 3 ou mais polos a mais que zeros, as assíntotas apontam para a direita e sempre existe um K crítico. "
             "Zeros à esquerda (PD, avanço) entortam o LGR para a esquerda e aumentam o K crítico. É isso que o slide quer dizer com \"acrescenta um zero, portanto aumenta a estabilidade\"."),
           H2k("3.5 Critério de Routh-Hurwitz (estabilidade sem achar as raízes)", "routh"),
@@ -567,7 +644,7 @@ def story():
                  eq(r"e(\infty)=\lim_{s\to0}s\cdot\frac{1}{1+\frac{1}{s(s^2+3s+2)}}\cdot\frac{1}{s^2}=\frac{1}{0+\frac{1}{2}}=2", 14),
                  P("De outra forma: K<sub>v</sub> = lim s·1/[s(s<super>2</super>+3s+2)] = 1/2, então e(∞) = 1/K<sub>v</sub> = 2. "
                    "A especificação pedia e(∞) = 0,2, ou seja, K<sub>v</sub> = 5, <b>10 vezes maior</b>. É isso que motiva o compensador de atraso da seção 8."))
-    S += dica("Roteiro do erro: (1) confira se a MF é estável; (2) conte os s na origem da FTMA (tipo); "
+    S += dica("Roteiro do erro: (1) confira se a malha fechada é estável; (2) conte os s na origem da FTMA (tipo); "
               "(3) identifique a entrada (degrau, rampa, parábola); (4) use a tabela. Só faça o limite completo se a questão pedir.",
               "Erro grande demais? Aumentar K reduz o erro, mas muda os polos (pode oscilar ou instabilizar). "
               "Para mexer no erro sem estragar o transitório, use <b>compensador de atraso</b>.")
@@ -578,7 +655,7 @@ def story():
     S += [H1("5. Lugar das raízes (LGR)", "lgr"),
           P("O <b>lugar geométrico das raízes</b> é o desenho, no plano s, do caminho que os <b>polos de malha fechada</b> percorrem quando o ganho K varia de 0 a ∞. "
             "Ele responde: \"se eu aumentar o ganho, o sistema fica mais rápido? Começa a oscilar? Fica instável? Com qual K?\""),
-          P("Os polos de MF são as raízes de 1 + KG(s)H(s) = 0, ou seja, KG(s)H(s) = −1. Um número complexo é −1 quando tem módulo 1 e ângulo 180°. Daí saem as duas condições:"),
+          P("Os polos de malha fechada são as raízes de 1 + KG(s)H(s) = 0, ou seja, KG(s)H(s) = −1. Um número complexo é −1 quando tem módulo 1 e ângulo 180°. Daí saem as duas condições:"),
           P("<b>Condição de ângulo:</b>"), eq(r"\angle G(s)H(s)=\sum\angle\mathrm{zeros}-\sum\angle\mathrm{polos}=\pm180^\circ(2k+1)"),
           P("<b>Condição de módulo:</b>"), eq(r"|K\,G(s)H(s)|=1\ \Rightarrow\ K=\frac{\prod\ \mathrm{dist.\ aos\ polos}}{\prod\ \mathrm{dist.\ aos\ zeros}}"),
           P("A <b>condição de ângulo</b> diz <i>se</i> um ponto pertence ao LGR. A <b>condição de módulo</b> diz <i>qual K</i> leva o polo até aquele ponto."),
@@ -641,7 +718,7 @@ def story():
                    "Testando (ou resolvendo numericamente), ω<sub>n</sub> = 0,667: s<sub>d</sub> = −0,333 + j0,577. Confira: 120° + 40,9° + 19,1° = 180° ✓."),
                  P("<b>3.</b> Condição de módulo (produto das distâncias aos polos):"),
                  eq(r"K=|s_d|\cdot|s_d+1|\cdot|s_d+2|=0{,}667\times0{,}882\times1{,}764=1{,}037", 14),
-                 P("Com K = 1,037 os polos de MF ficam em −0,333 ± j0,577 e −2,333. Repare que K = 1 (aula) dá ζ = 0,515, bem perto disso."))
+                 P("Com K = 1,037 os polos de malha fechada ficam em −0,333 ± j0,577 e −2,333. Repare que K = 1 (aula) dá ζ = 0,515, bem perto disso."))
     S += exemplo("Exemplo 6.2 – K máximo e K para erro",
                  P("<b>Estabilidade:</b> pelo Routh (seções 3.5 e 5.3), K<sub>máx</sub> = 6 (oscila com ω = 1,414 rad/s)."),
                  P("<b>Erro à rampa ≤ 0,2:</b> K<sub>v</sub> = K/2 ≥ 5 ⇒ K ≥ 10. Mas K = 10 > 6 deixa o sistema <b>instável</b>! "
@@ -724,7 +801,7 @@ def story():
         "<b>Parte PD (avanço):</b> calcule ∠G(s<sub>d</sub>), ache a deficiência angular e coloque o zero z<sub>PD</sub> que fornece esse ângulo.",
         "<b>Parte PI (atraso):</b> zero z<sub>PI</sub> bem perto da origem (ex.: −0,1) ou escolhido para mexer pouco no polo (ex.: deslocamento de −2°, compensado no PD).",
         "K pela condição de módulo em s<sub>d</sub>. Expanda K(s+z<sub>PD</sub>)(s+z<sub>PI</sub>)/s para ler K<sub>p</sub>, K<sub>i</sub> e K<sub>d</sub>.",
-        "Confira os polos de MF. O zero do PI cria um polo lento perto dele, o que deixa uma \"cauda\" na resposta."], 1):
+        "Confira os polos de malha fechada. O zero do PI cria um polo lento perto dele, o que deixa uma \"cauda\" na resposta."], 1):
         S.append(Paragraph(r, ParagraphStyle("rpid", parent=body, leftIndent=18), bulletText=f"{i}."))
     
     S += [CondPageBreak(10 * cm), Paragraph("7.5 Controlador on-off (liga-desliga)", h2),
@@ -754,6 +831,43 @@ def story():
                 ["Quando usar", "processos lentos e tolerantes (temperatura, nível)", "precisão, rapidez, posição, velocidade"]], [3.4, 6.5, 6.5])
     S += dica("Questão sobre on-off: fale em <b>duas posições</b>, <b>histerese</b>, <b>oscilação permanente</b> (ciclo-limite) e no <b>compromisso</b> banda × número de chaveamentos. "
               "Não tente calcular erro em regime com K<sub>p</sub>: o on-off não é linear.")
+    
+    S += [CondPageBreak(10 * cm), Paragraph("7.6 Alocação de zeros (e de polos)", h2),
+          P("<b>Alocação de zeros</b> é escolher <b>onde ficam os zeros do controlador</b> para moldar o lugar das raízes e a resposta. Como o ganho K só move os polos <i>sobre</i> o LGR existente, "
+            "os zeros (e os polos) do controlador são o que <b>muda o desenho do LGR</b>. Um zero atrai os ramos e soma ângulo positivo nos pontos acima dele; um polo repele e soma ângulo negativo. "
+            "<b>Alocação de polos</b> é o mesmo raciocínio no projeto por estados (capítulo 11), em que se escolhe diretamente onde ficam todos os polos de malha fechada."),
+          ]
+    S += table([["Técnica", "Ideia", "Onde aparece neste guia"],
+                ["Cancelamento", "pôr o zero em cima de um polo lento e estável da planta, que some da resposta", "Rashid: τ<sub>c</sub> = τ<sub>2</sub> na malha de corrente (9.7); avanço 8.2 (zero em −2); Ex. 13.14 (zero em −10)"],
+                ["Deficiência angular", "posicionar o zero para fornecer o ângulo que falta para o LGR passar no polo desejado", "Ex. 13.15 (zero do PD em −7), Ex. 13.13 (−3,79)"],
+                ["Zero perto da origem (PI/atraso)", "zero colado no polo do integrador: zera o erro sem mudar o transitório (dipolo)", "atraso da aula (8.5); PI do motor (9.8)"],
+                ["Zero na referência / pré-filtro", "um polo no caminho da referência cancela um zero da malha fechada e reduz o sobressinal", "Rashid: rede polo-zero que baixa de 43,4% para 8,1% (9.8)"],
+                ["Zero duplo do PID", "o PID de Ziegler-Nichols põe dois zeros iguais em −4/P<sub>cr</sub>", "7.7"]], [3.6, 6.4, 6.4])
+    S += [P("<b>Cuidados:</b> nunca cancele um polo instável ou mal conhecido (se ele mudar um pouco, o cancelamento falha e o modo instável aparece). Zeros aumentam o sobressinal (figura de ordem superior, seção 2.4). "
+            "E zero no semiplano direito não se corrige com controlador: ele limita o desempenho."),
+          CondPageBreak(10 * cm), H2k("7.7 Regras de Ziegler-Nichols (sintonia de PID)", "zn"),
+          P("<b>O que é:</b> um conjunto de regras empíricas (Ziegler e Nichols, 1942) para escolher K<sub>p</sub>, T<sub>i</sub> e T<sub>d</sub> de um PID <b>sem conhecer o modelo da planta</b>, só com um ensaio simples. "
+            "<b>O que representa:</b> as regras buscam uma resposta com <b>razão de decaimento de 1/4</b> (cada pico tem um quarto da amplitude do anterior). É uma resposta rápida, mas com sobressinal grande (tipicamente 25 a 60%). "
+            "É um <b>ponto de partida</b> para o ajuste fino, não o projeto final."),
+          Paragraph("1º método: curva de reação (resposta ao degrau em malha aberta)", h3),
+          P("Aplique um degrau na planta sem controlador. Se a resposta tiver forma de \"S\" (sem polo na origem e sem oscilação), trace a reta tangente no ponto de inflexão. "
+            "Ela corta o eixo do tempo em <b>L</b> (atraso aparente) e chega ao valor final após <b>T</b> (constante de tempo aparente).")]
+    S += table([["Controlador", "K<sub>p</sub>", "T<sub>i</sub>", "T<sub>d</sub>"],
+                ["P", "T/L", "∞", "0"], ["PI", "0,9·T/L", "L/0,3", "0"], ["PID", "1,2·T/L", "2L", "0,5L"]], [4, 4, 4, 4.4])
+    S += [Paragraph("2º método: ganho crítico (oscilação sustentada)", h3),
+          P("Com o controle só proporcional em malha fechada, aumente K<sub>p</sub> até a saída <b>oscilar sem crescer nem morrer</b>. Esse é o <b>ganho crítico K<sub>cr</sub></b>, e o período da oscilação é <b>P<sub>cr</sub></b>. "
+            "É exatamente o ponto em que o LGR cruza o eixo jω: dá para obter K<sub>cr</sub> pelo Routh e P<sub>cr</sub> = 2π/ω pela linha s² (seção 3.5).")]
+    S += table([["Controlador", "K<sub>p</sub>", "T<sub>i</sub>", "T<sub>d</sub>"],
+                ["P", "0,5·K<sub>cr</sub>", "∞", "0"], ["PI", "0,45·K<sub>cr</sub>", "P<sub>cr</sub>/1,2", "0"], ["PID", "0,6·K<sub>cr</sub>", "0,5·P<sub>cr</sub>", "0,125·P<sub>cr</sub>"]], [4, 4, 4, 4.4])
+    S += [eq(r"G_{PID}=K_p\left(1+\frac{1}{T_is}+T_ds\right)=0{,}075\,K_{cr}P_{cr}\,\frac{(s+4/P_{cr})^2}{s}", 14),
+          P("Ou seja, o PID de Ziegler-Nichols é uma <b>alocação de zeros</b> automática: um polo na origem e um <b>zero duplo em s = −4/P<sub>cr</sub></b>.")]
+    S += exemplo("Exemplos: planta da aula e malha de velocidade do motor (Acionamentos)",
+                 P("<b>Planta da aula, 1/[s(s+1)(s+2)]:</b> pelo Routh, K<sub>cr</sub> = 6 e ω = √2 ⇒ P<sub>cr</sub> = 2π/√2 = 4,44 s. "
+                   "PID: K<sub>p</sub> = 3,6, T<sub>i</sub> = 2,22 s e T<sub>d</sub> = 0,555 s (zero duplo em −0,90). Simulando: sobressinal de ~59% e t<sub>s</sub> ≈ 13 s. É rápido, mas oscilatório, como esperado do critério de 1/4."),
+                 P("<b>Parte de Acionamentos (motor do Rashid, Ex. 14.14):</b> conversor + motor + tacogerador com controle P. A oscilação sustentada aparece com K<sub>cr</sub> = 50, a 165 rad/s ⇒ P<sub>cr</sub> = 38 ms. "
+                   "PID: K<sub>p</sub> = 30, T<sub>i</sub> = 19,0 ms e T<sub>d</sub> = 4,7 ms. Curiosidade: o T<sub>i</sub> = 19 ms coincide com o τ<sub>s</sub> = 19,02 ms do ótimo simétrico do livro. Sobressinal simulado de ~58%: daí a necessidade de ajuste fino ou de pré-filtro."),
+                 fig("zn", 15.5))
+    
     S.append(CondPageBreak(25 * cm))
     
     
@@ -799,7 +913,7 @@ def story():
         "Confira: polos dominantes de fato dominantes? Erro em regime aceitável? Simule o degrau."], 1):
         S.append(Paragraph(r, ParagraphStyle("rl2", parent=body, leftIndent=18), bulletText=f"{i}."))
     S += exemplo("Exemplo 8.2 – Projeto de avanço",
-                 P("Planta G(s) = 4/[s(s+2)]. Sem compensador: MF = 4/(s<super>2</super>+2s+4), ζ = 0,5, ω<sub>n</sub> = 2 (t<sub>s</sub> ≈ 4 s). "
+                 P("Planta G(s) = 4/[s(s+2)]. Sem compensador, malha fechada = 4/(s<super>2</super>+2s+4), ζ = 0,5, ω<sub>n</sub> = 2 (t<sub>s</sub> ≈ 4 s). "
                    "<b>Quero o dobro da velocidade:</b> ζ = 0,5 e ω<sub>n</sub> = 4 ⇒ s<sub>d</sub> = −2 ± j3,464."),
                  P("<b>Ângulo da planta em s<sub>d</sub>:</b> ∠s<sub>d</sub> = 120°, ∠(s<sub>d</sub>+2) = 90° ⇒ ∠G = −210°. Deficiência: φ = −180° − (−210°) = <b>+30°</b> (precisa de AVANÇO)."),
                  P("<b>Zero e polo:</b> ponha o zero em −2 (cancela o polo da planta). Ele contribui +90°. O polo deve contribuir 90° − 30° = 60°: "
@@ -826,7 +940,7 @@ def story():
                    "com denominador s<super>4</super> + 3,005s<super>3</super> + 2,015s<super>2</super> + 0,01s. Pela condição de módulo no novo LGR, "
                    "<b>K<sub>c</sub> = 0,975</b> mantém ζ ≈ 0,515, com polos dominantes em <b>−0,317 ± j0,53</b> (exatamente o que está no quadro)."),
                  P("<b>5. Resultado:</b> K<sub>v</sub> = 0,975·10/2 = 4,875 ⇒ e(∞) = 0,205 ≈ 0,2 ✓. O transitório fica quase igual (Figura " + str(FN["atraso_exemplo"]) + "). "
-                   "O preço: surge um polo de MF lento em −0,055, perto do zero −0,05, que deixa uma \"cauda\" lenta pequena na resposta."),
+                   "O preço: surge um polo de malha fechada lento em −0,055, perto do zero −0,05, que deixa uma \"cauda\" lenta pequena na resposta."),
                  fig("atraso_exemplo", 15, "Figura 11 – Com o atraso o degrau quase não muda, mas o erro à rampa cai de 2 para ~0,2."))
     S += [Paragraph("8.6 Avanço × atraso × PID", h2)]
     S += table([["", "Avanço", "Atraso"],
@@ -847,57 +961,152 @@ def story():
     
     
     
-    # ================= 9 acionamentos =================
-    S += [H1("9. Acionamentos elétricos com teoria de controle: o motor CC", "acion"),
-          P("Acionamento é o conjunto conversor + motor + controle que faz uma máquina elétrica girar na velocidade, posição ou torque desejados. É a aplicação mais direta de tudo o que veio antes: "
-            "o motor é a planta, o conversor (buck, ponte H, PWM) é o atuador, o encoder/tacogerador é o sensor e o microcontrolador roda o PI/PID."),
-          Paragraph("9.1 Modelo do motor CC com excitação independente", h2)]
-    S += B(["<b>Armadura (elétrica):</b> V<sub>a</sub> = R<sub>a</sub>i<sub>a</sub> + L<sub>a</sub>di<sub>a</sub>/dt + E<sub>a</sub>, com força contraeletromotriz E<sub>a</sub> = K<sub>b</sub>ω.",
-            "<b>Torque:</b> T = K<sub>t</sub>i<sub>a</sub> (no SI, K<sub>t</sub> = K<sub>b</sub> = K).",
-            "<b>Mecânica:</b> J dω/dt + Bω = T − T<sub>L</sub> (inércia, atrito viscoso, torque de carga)."])
-    S += [fig("motor_blocos", 15, "Figura 0 – Diagrama de blocos do motor CC: a fcem K<sub>b</sub>ω é uma realimentação natural."),
-          eq(r"\frac{\Omega(s)}{V_a(s)}=\frac{K}{(L_as+R_a)(Js+B)+K^2}"),
-          P("É um sistema de <b>2ª ordem</b> com dois polos: um ligado à constante de tempo elétrica τ<sub>e</sub> = L<sub>a</sub>/R<sub>a</sub> e outro à mecânica τ<sub>m</sub> = J/B. Repare que a fcem já funciona como uma malha fechada interna. "
-            "Como em geral τ<sub>e</sub> ≪ τ<sub>m</sub>, é comum desprezar L<sub>a</sub> e ficar com um 1ª ordem: Ω/V<sub>a</sub> ≈ [K/(R<sub>a</sub>J)]/[s + (BR<sub>a</sub> + K²)/(R<sub>a</sub>J)]."),
+    # ================= 9 acionamentos (Rashid) =================
+    S += [H1("9. Parte de Acionamentos Elétricos: acionamentos CC e controle", "acion")]
+    S += box("Parte de Acionamentos Elétricos", ["Este capítulo é da disciplina de <b>Acionamentos Elétricos</b>. A única base é o <b>Capítulo 14 – Acionamentos CC</b> do Rashid (<i>Eletrônica de Potência</i>), que você enviou. "
+             "As equações e os exemplos levam o número do livro (Eq. 14.x, Exemplo 14.x). Todas as contas dos exemplos foram refeitas e conferem. "
+             "O objetivo é <b>ligar cada parte do acionamento a um conceito de controle</b> deste guia."], "#fdf2e9", "#d35400")
+    S += [Paragraph("9.1 Motor CC com excitação independente (seção 14.2.1)", h2),
+          P("Campo e armadura têm alimentações separadas. As equações do motor são:")]
+    S += B(["Campo: v<sub>f</sub> = R<sub>f</sub>i<sub>f</sub> + L<sub>f</sub>di<sub>f</sub>/dt", "Armadura: v<sub>a</sub> = R<sub>a</sub>i<sub>a</sub> + L<sub>a</sub>di<sub>a</sub>/dt + e<sub>g</sub>",
+            "Força contraeletromotriz (fcem): e<sub>g</sub> = K<sub>v</sub>ωi<sub>f</sub>", "Torque desenvolvido: T<sub>d</sub> = K<sub>t</sub>i<sub>f</sub>i<sub>a</sub> (K<sub>t</sub> = K<sub>v</sub>)",
+            "Mecânica: T<sub>d</sub> = J·dω/dt + Bω + T<sub>L</sub>"])
+    S += [P("Em regime permanente (derivadas nulas), Eq. 14.7: <b>ω = (V<sub>a</sub> − R<sub>a</sub>I<sub>a</sub>)/(K<sub>v</sub>I<sub>f</sub>)</b>. A velocidade pode ser controlada pela tensão da armadura V<sub>a</sub> (abaixo da velocidade nominal, a <b>torque constante</b>), "
+            "pela corrente de campo I<sub>f</sub> (acima da nominal, enfraquecimento de campo, a <b>potência constante</b>) ou pela demanda de torque (I<sub>a</sub>)."),
+          P("<b>Leitura de controle:</b> V<sub>a</sub> é a <b>entrada de controle</b> (o atuador mexe nela), ω é a <b>saída</b> e o torque de carga T<sub>L</sub> é uma <b>perturbação</b>: pelo termo R<sub>a</sub>I<sub>a</sub>, carga maior derruba a velocidade. Sem realimentação, nada corrige isso.")]
+    S += exemplo("Exemplo 14.1 (conferido)",
+                 P("Motor de 15 hp, 220 V, 2000 rpm; carga de 45 N·m a 1200 rpm; R<sub>f</sub> = 147 Ω, R<sub>a</sub> = 0,25 Ω, K<sub>v</sub> = 0,7032, V<sub>f</sub> = 220 V. "
+                   "I<sub>f</sub> = 220/147 = 1,497 A; ω = 125,66 rad/s; I<sub>a</sub> = 45/(0,7032 × 1,497) = <b>42,75 A</b>; E<sub>g</sub> = 0,7032 × 125,66 × 1,497 = <b>132,28 V</b>; "
+                   "V<sub>a</sub> = 0,25 × 42,75 + 132,28 = <b>142,97 V</b>; corrente nominal 15 × 746/220 = <b>50,87 A</b>."))
+    S += [Paragraph("9.2 Motor série e linearização (seções 14.2.2 e 14.7.3)", h2),
+          P("No motor série, a mesma corrente passa pelo campo e pela armadura (i<sub>f</sub> = i<sub>a</sub>), então T<sub>d</sub> = K<sub>t</sub>i<sub>a</sub>² (Eq. 14.76): torque de partida muito alto, por isso é usado em tração. "
+            "<b>Leitura de controle:</b> o produto i<sub>a</sub>² é <b>não linear</b> e a função de transferência não vale diretamente. O livro <b>lineariza em torno do ponto de operação</b> (I<sub>a0</sub>, ω<sub>0</sub>), "
+            "escrevendo cada variável como valor de operação + pequena variação Δ e desprezando produtos de variações. Resultado: ΔT<sub>d</sub> = 2K<sub>v</sub>I<sub>a0</sub>Δi<sub>a</sub> (Eq. 14.81). "
+            "É a técnica padrão para aplicar Laplace, LGR e Bode a sistemas não lineares: só vale para <b>pequenos desvios</b>."),
+          Paragraph("9.3 O conversor como atuador (seções 14.6.1 e 14.7.4)", h2),
+          P("<b>Conversor CC-CC</b> (o buck do seu trabalho): V<sub>a</sub> = k·V<sub>s</sub> (Eq. 14.32), com k o ciclo de trabalho. "
+            "<b>Retificador controlado</b> monofásico ou trifásico: V<sub>a</sub> proporcional a cos α. Com α = cos<super>−1</super>(V<sub>c</sub>/V<sub>cm</sub>), a relação fica linear (Eq. 14.85 e 14.87)."),
           ]
-    S += exemplo("Exemplo numérico (valores didáticos)",
-                 P("R<sub>a</sub> = 1 Ω, L<sub>a</sub> = 0,5 H, K = 0,5 V·s/rad, J = 0,1 kg·m², B = 0,1 N·m·s. Então (0,5s + 1)(0,1s + 0,1) + 0,25 = 0,05s² + 0,15s + 0,35 e"),
-                 eq(r"\frac{\Omega}{V_a}=\frac{10}{s^2+3s+7}\qquad p=-1{,}5\pm j2{,}18,\ \ \zeta=0{,}57,\ \ \omega_n=2{,}65\ \mathrm{rad/s}", 13),
-                 P("<b>Polos e zeros:</b> o par complexo dá uma partida com ~11% de sobressinal e t<sub>s</sub> ≈ 4/1,5 = 2,7 s. Não há polo na origem, então o sistema é <b>tipo 0</b> em velocidade. "
-                   "Ganho estático 10/7 = 1,43 (rad/s)/V."),
-                 P("<b>Controle P (K<sub>p</sub> = 1):</b> MF = 10/(s² + 3s + 17) ⇒ erro ao degrau 1 − 10/17 = <b>41%</b>, e os polos −1,5 ± j3,84 oscilam mais. Aumentar K<sub>p</sub> reduz o erro, mas a parte real fica presa em −1,5 e só a oscilação cresce."),
-                 P("<b>Controle PI (0,6 + 1,2/s):</b> o polo na origem torna o sistema tipo 1 ⇒ <b>erro zero</b> em velocidade, mesmo com torque de carga constante. O zero em −2 compensa o atraso do integrador. "
-                   "Polos de MF: −1,10 e −0,95 ± j3,16. O dominante é o <b>real</b> −1,10, por isso o sobressinal fica em só ~6% (t<sub>s</sub> ≈ 2,7 s)."),
-                 fig("motor_resp", 12))
-    S += [Paragraph("9.2 Controle em cascata (corrente dentro da velocidade)", h2),
-          P("Acionamentos reais usam <b>duas malhas</b>. A <b>interna, de corrente</b> (rápida, PI), mede i<sub>a</sub> e controla a tensão aplicada. Isso controla diretamente o torque (T = Ki<sub>a</sub>) e permite <b>limitar a corrente</b>, protegendo o motor na partida. "
-            "A <b>externa, de velocidade</b> (mais lenta, PI), gera a referência de corrente. Regra prática: a malha interna deve ser 5 a 10 vezes mais rápida que a externa, para que a externa a enxergue como um ganho quase unitário."),
-          Paragraph("9.3 O atuador: conversor buck e PWM (o seu trabalho)", h2),
-          P("O conversor CC-CC buck chaveado com ciclo de trabalho D entrega, em média, <b>V<sub>o</sub> = D·V<sub>in</sub></b>. Para o controle, ele é um <b>ganho</b> (V<sub>in</sub> por unidade de D) mais um filtro LC de 2ª ordem, "
-            "com polos em ω<sub>0</sub> = 1/√(LC), que costumam ser bem mais rápidos que o motor. O Arduino lê a velocidade ou a tensão, calcula o PI digital (seção 12) e ajusta o PWM. Esse é exatamente o \"buck com feedback\": realimentação de tensão ou de velocidade, PI e saturação de D entre 0 e 1."),
-          Paragraph("9.4 O que os polos implicam no motor", h2)]
-    S += B(["<b>Polo mecânico (lento):</b> domina a resposta de velocidade; inércia J maior ⇒ polo mais perto da origem ⇒ motor mais lento.",
-            "<b>Polo elétrico (rápido):</b> L<sub>a</sub>/R<sub>a</sub>; importa para a malha de corrente e para o ripple do PWM.",
-            "<b>K (fluxo):</b> K² aparece somando no denominador. Fluxo maior ⇒ realimentação de fcem mais forte ⇒ polos mais rápidos e menor velocidade por volt (enfraquecimento de campo faz o contrário).",
-            "<b>Torque de carga T<sub>L</sub></b> é um <b>distúrbio</b>. Com P sobra erro de velocidade proporcional a T<sub>L</sub>; com PI (polo na origem antes do ponto de entrada do distúrbio) o erro vai a zero."])
-    S += [P("<i>Observação:</i> as questões da prova de Acionamentos que você mandou em outro chat não estão acessíveis daqui. Reenvie as fotos que eu resolvo cada uma nesta seção.")]
+    S += table([["Conversor", "Ganho K<sub>r</sub>", "Atraso τ<sub>r</sub>", "τ<sub>r</sub> com f<sub>s</sub> = 60 Hz"],
+                ["CC-CC", "V<sub>s</sub>/V<sub>cm</sub> (k = V<sub>c</sub>/V<sub>cm</sub>)", "T<sub>s</sub>/2", "8,333 ms"],
+                ["Monofásico", "0,9·V<sub>s</sub>/V<sub>cm</sub> (Eq. 14.86)", "T<sub>s</sub>/8", "2,083 ms"],
+                ["Trifásico", "2,339·V<sub>s</sub>/V<sub>cm</sub> (Eq. 14.88)", "T<sub>s</sub>/12", "1,389 ms"]], [3, 5.4, 3, 5])
+    S += [eq(r"G_r(s)=K_r\,e^{-s\tau_r}\approx\frac{K_r}{1+s\tau_r}\qquad \mathrm{(Eq.\ 14.89\ e\ 14.90)}"),
+          P("<b>Leitura de controle:</b> o conversor é um <b>ganho</b> mais um <b>atraso de transporte</b>. Depois que uma chave liga, o comando só muda no próximo chaveamento. O atraso é aproximado por um <b>polo rápido</b> em −1/τ<sub>r</sub>, "
+            "que soma atraso de fase e reduz as margens de estabilidade (capítulo 10).")]
+    S += exemplo("Exemplo 14.8 (conferido) – motor alimentado por conversor CC-CC",
+                 P("V<sub>s</sub> = 600 V, k = 0,6, R<sub>a</sub> = 0,05 Ω, K<sub>v</sub> = 1,527, I<sub>a</sub> = 250 A, I<sub>f</sub> = 2,5 A. P<sub>i</sub> = 0,6 × 600 × 250 = <b>90 kW</b>; "
+                   "R<sub>eq</sub> = 600/(250 × 0,6) = <b>4 Ω</b>; V<sub>a</sub> = 360 V; E<sub>g</sub> = 360 − 0,05 × 250 = 347,5 V; ω = 347,5/(1,527 × 2,5) = <b>91,03 rad/s (869,3 rpm)</b>; "
+                   "T<sub>d</sub> = 1,527 × 250 × 2,5 = <b>954,4 N·m</b>."))
+    S += [Paragraph("9.4 Função de transferência em malha aberta (seção 14.7.2)", h2),
+          P("Com o campo constante (K<sub>b</sub> = K<sub>v</sub>I<sub>f</sub>), as equações viram um modelo em <b>espaço de estados</b> (Eq. 14.57), com estados i<sub>a</sub> e ω e entradas v<sub>a</sub> e T<sub>L</sub> (capítulo 11):"),
+          P("<font face='DejaVuSansMono'>A = [ −Rm/Lm   −Kb/Lm ;  Kb/J   −B/J ]      B = [ 1/Lm   0 ;  0   −1/J ]</font>"),
+          P("Os autovalores de A (Eq. 14.60) são <b>sempre reais e negativos</b>: o livro conclui que <b>o motor é estável em malha aberta</b> (capítulo 3). Em Laplace, com condições iniciais nulas, "
+            "aparecem as constantes de tempo <b>τ<sub>a</sub> = L<sub>m</sub>/R<sub>m</sub></b> (elétrica, da armadura) e <b>τ<sub>m</sub> = J/B</b> (mecânica):"),
+          eq(r"\frac{\omega(s)}{V_r(s)}=\frac{K_2K_vI_f/(R_mB)}{s^2\tau_a\tau_m+s(\tau_a+\tau_m)+1+(K_vI_f)^2/(R_mB)}\quad\mathrm{(Eq.\ 14.68)}", 13),
+          P("A resposta ao torque de carga (Eq. 14.69) tem o mesmo denominador e um <b>zero</b> em −1/τ<sub>a</sub>. Pelo teorema do valor final (s = 0), Eq. 14.70 e 14.71: Δω = K<sub>2</sub>K<sub>v</sub>I<sub>f</sub>ΔV<sub>r</sub>/[R<sub>m</sub>B + (K<sub>v</sub>I<sub>f</sub>)²] e Δω = −R<sub>m</sub>ΔT<sub>L</sub>/[R<sub>m</sub>B + (K<sub>v</sub>I<sub>f</sub>)²]."),
+          ]
+    S += box("Polos e zeros nesta parte", ["<b>2ª ordem, superamortecido</b> (dois polos reais). Com o motor do Exemplo 14.14 (R<sub>m</sub> = 6,5 Ω, L<sub>m</sub> = 67 mH, J = 0,06, B = 0,087, K<sub>b</sub> = 1,24): "
+             "polos em <b>−5,64</b> (τ<sub>1</sub> = 0,18 s, dominante, ligado à mecânica) e <b>−92,8</b> (τ<sub>2</sub> = 0,0108 s, ligado à parte elétrica). Ganho estático de 0,59 (rad/s)/V. "
+             "Sem polo na origem ⇒ <b>tipo 0</b>: com controle P sempre sobra erro de velocidade. A fcem (K<sub>b</sub>²) soma no denominador: é uma realimentação negativa interna que estabiliza (seção A.5). "
+             "O Bode desse motor está na seção 10.1."], "#f3eefb", "#7d3c98")
+    S += [Paragraph("9.5 Malha fechada de velocidade (seção 14.7.5, Exemplo 14.13)", h2),
+          P("Um sensor de velocidade de ganho K<sub>1</sub> fecha a malha: V<sub>e</sub> = V<sub>r</sub> − K<sub>1</sub>ω. O denominador ganha o termo <b>K<sub>1</sub>K<sub>2</sub>K<sub>v</sub>I<sub>f</sub></b> (Eq. 14.92 a 14.95):"),
+          eq(r"\Delta\omega=-\frac{R_m\,\Delta T_L}{R_mB+(K_vI_f)^2+K_1K_2K_vI_f}\quad\mathrm{(Eq.\ 14.95)}", 13),
+          ]
+    S += table([["Item do Ex. 14.13 (50 kW, 240 V, 1700 rpm)", "Resultado"],
+                ["(a) torque nominal", "280,87 N·m"], ["(b) V<sub>a</sub> e V<sub>r</sub> para 1700 rpm", "V<sub>a</sub> = 230,98 V; V<sub>b</sub> = 16,912 V; V<sub>r</sub> = 19,222 V"],
+                ["(c) velocidade com torque nominal (malha fechada)", "175,98 rad/s = 1680,5 rpm"], ["(d) torque 10% acima do nominal", "1678,5 rpm"],
+                ["(e) referência 10% menor", "1530 rpm"], ["(f) (d) e (e) juntos (superposição)", "1508,5 rpm"],
+                ["(g) regulação em malha aberta", "1537,7 rpm a plena carga: 10,55%"], ["(h) regulação em malha fechada", "1,16% (cerca de 10 vezes menor)"]], [8.4, 8])
+    S += [P("<b>Leitura de controle:</b> (1) o termo novo no denominador é o <b>ganho de malha</b>, e dividir por (1 + ganho de malha) é a <b>redução de sensibilidade</b> da seção A.4; "
+            "(2) o item (f) usa <b>superposição</b>, que só vale porque o modelo é linear (seção 1.0); (3) mesmo em malha fechada sobra erro porque o controle é <b>proporcional</b> e o motor é <b>tipo 0</b> (capítulo 4). Por isso os acionamentos reais usam PI."),
+          Paragraph("9.6 Controle em cascata: malha de corrente dentro da de velocidade (seção 14.7.6)", h2),
+          P("A malha interna de <b>corrente</b> responde a uma súbita demanda de torque e <b>limita a corrente</b> (o controlador de velocidade alimenta um limitador que gera a referência de corrente). A malha externa é a de <b>velocidade</b>. "
+            "O livro <b>desacopla</b> a fcem movendo o bloco K<sub>b</sub> para a realimentação de I<sub>a</sub> (Figura 14.30). Assim, ω/V<sub>a</sub> = (ω/I<sub>a</sub>)·(I<sub>a</sub>/V<sub>a</sub>) (Eq. 14.96 a 14.100), com dois controladores <b>PI</b>:"),
+          eq(r"G_c(s)=\frac{K_c(1+s\tau_c)}{s\tau_c}\qquad G_s(s)=\frac{K_s(1+s\tau_s)}{s\tau_s}\qquad G_\omega(s)=\frac{K_\omega}{1+s\tau_\omega}\quad\mathrm{(Eq.\ 14.101\ a\ 14.103)}", 12),
+          P("<b>Leitura de controle:</b> cada PI acrescenta um polo na origem (erro zero) e um zero em −1/τ (que será <b>alocado</b>, seção 7.6). O tacogerador com filtro é um sensor de 1ª ordem."),
+          Paragraph("9.7 Projeto do controlador de corrente (seção 14.7.7)", h2),
+          P("Ganho de malha (Eq. 14.104): K<sub>m</sub>K<sub>c</sub>K<sub>r</sub>H<sub>c</sub>/τ<sub>c</sub> · (1 + sτ<sub>c</sub>)(1 + sτ<sub>m</sub>)/[s(1 + sτ<sub>1</sub>)(1 + sτ<sub>2</sub>)(1 + sτ<sub>r</sub>)]. O livro faz três simplificações:"),
+          ]
+    S += B(["1 + sτ<sub>m</sub> ≈ sτ<sub>m</sub>, porque τ<sub>m</sub> é grande: o zero lento quase cancela o integrador.",
+            "<b>τ<sub>c</sub> = τ<sub>2</sub></b>: o zero do PI é <b>alocado sobre o polo</b> −1/τ<sub>2</sub>, que é <b>cancelado</b> (técnica de cancelamento, seção 7.6).",
+            "O que sobra é um sistema de <b>2ª ordem</b>, K/[(1 + sτ<sub>1</sub>)(1 + sτ<sub>r</sub>)]. Escolhendo <b>ζ = 0,707</b> (sobressinal de 4,3%) sai K<sub>c</sub> = τ<sub>1</sub>τ<sub>c</sub>/(2τ<sub>r</sub>K<sub>m</sub>K<sub>r</sub>H<sub>c</sub>τ<sub>m</sub>) (Eq. 14.110)."])
+    S += [Paragraph("9.8 Projeto do controlador de velocidade: ótimo simétrico (seção 14.7.8)", h2),
+          P("A malha de corrente fechada é aproximada por <b>1ª ordem</b>: K<sub>i</sub>/(1 + sτ<sub>i</sub>) (Eq. 14.111). Os atrasos pequenos se somam num atraso equivalente τ<sub>e</sub> = τ<sub>i</sub> + τ<sub>ω</sub>. "
+            "Anulando os coeficientes de ω² e ω⁴ do módulo do denominador (para alargar a <b>banda</b>, capítulo 10), resulta o <b>ótimo simétrico</b>:"),
+          eq(r"K_s=\frac{1}{2K_\omega\tau_e}\qquad \tau_s=4\tau_e\qquad \frac{\omega}{\omega_r^*}=\frac{1}{K_\omega}\,\frac{1+4s\tau_e}{1+4s\tau_e+8s^2\tau_e^2+8s^3\tau_e^3}\quad\mathrm{(Eq.\ 14.121\ a\ 14.123)}", 12),
+          P("Malha fechada de <b>3ª ordem com um zero</b> em −1/(4τ<sub>e</sub>). Resultado: t<sub>r</sub> = 3,1τ<sub>e</sub>, <b>sobressinal de 43,4%</b>, t<sub>s</sub> = 16,5τ<sub>e</sub>. "
+            "O sobressinal alto vem do <b>zero</b> (seção 2.4). A solução do livro é uma <b>rede de compensação polo-zero</b> 1/(1 + 4sτ<sub>e</sub>) na referência, que cancela esse zero (Eq. 14.125): "
+            "t<sub>r</sub> = 7,6τ<sub>e</sub>, <b>sobressinal de 8,1%</b>, t<sub>s</sub> = 13,3τ<sub>e</sub>. Conferi os três números das duas respostas por simulação. "
+            "É a troca clássica: menos sobressinal custa mais tempo de subida."),
+          fig("rashid_velocidade", 13.5, "Figura 0 – Malha de velocidade do Exemplo 14.14 com e sem a rede de compensação."),
+          ]
+    S += table([["Exemplo 14.14 (220 V, 6,4 A, 1570 rpm; trifásico 230 V, 60 Hz)", "Resultado conferido"],
+                ["(a) ganho e atraso do conversor", "K<sub>r</sub> = 29,71 V/V; τ<sub>r</sub> = 1,39 ms"], ["(b) ganho da realimentação de corrente", "H<sub>c</sub> = 7,41/20 = 0,37 V/A"],
+                ["(c) constantes do motor", "K<sub>m</sub> = 0,041; polos −5,64 e −92,83 ⇒ τ<sub>1</sub> = 0,18 s, τ<sub>2</sub> = 0,0108 s; τ<sub>m</sub> = 0,69 s"],
+                ["(d) controlador de corrente", "τ<sub>c</sub> = τ<sub>2</sub> = 0,0108 s; K<sub>c</sub> = 2,19"],
+                ["(e) malha de corrente simplificada", "K<sub>1</sub> = 63,88; K<sub>i</sub> = 2,66; τ<sub>i</sub> = 2,76 ms; τ<sub>e</sub> = 4,76 ms; K<sub>ω</sub> = 4,07"],
+                ["(f) controlador de velocidade otimizado", "K<sub>s</sub> = 25,85; τ<sub>s</sub> = 19,02 ms"]], [7.4, 9])
+    S += [P("<i>Nota:</i> numa linha do cálculo de K<sub>1</sub> o livro escreve \"0,4\" no lugar de K<sub>m</sub> = 0,04. É só erro de digitação: o resultado 63,88 confere com 0,041.")]
+    S += [Paragraph("9.9 Conversor CC-CC em quatro quadrantes, PLL e microcontrolador (seções 14.7.9 a 14.7.11)", h2)]
+    S += B(["<b>Quatro quadrantes</b> (ponte de IGBTs): para acelerar, T<sub>1</sub>/T<sub>4</sub>/D<sub>2</sub> funcionam como <b>buck</b> (v<sub>a</sub> = δV<sub>CC</sub>, Eq. 14.127). Na frenagem regenerativa, T<sub>2</sub>/D<sub>4</sub> funcionam como <b>boost</b> e devolvem energia à fonte. O controle escolhe o modo pelo sinal do erro de velocidade.",
+            "<b>PLL</b> (malha sincronizada pela fase): a velocidade vira um trem de pulsos (encoder) e é comparada <b>em fase</b> com uma referência digital. É uma realimentação muito precisa: o livro cita regulação melhor que os 0,2% dos sensores analógicos.",
+            "<b>Microcontrolador:</b> lê velocidade e corrente por conversor A/D, roda as malhas de corrente e de velocidade em software, gera os pulsos, protege e diagnostica. Isso é <b>controle digital</b> (capítulo 12): o PI vira equação de diferenças e o período de amostragem passa a contar na estabilidade."])
+    S += [Paragraph("9.10 Mapa: conceito de controle × onde aparece no capítulo 14", h2)]
+    S += table([["Conceito deste guia", "Onde aparece no Rashid"],
+                ["Malha aberta × fechada, sensibilidade (A)", "14.7.5 e Ex. 14.13: regulação de 10,55% para 1,16%"],
+                ["Realimentação negativa natural (A.5)", "a fcem K<sub>b</sub>ω, que torna o motor estável em malha aberta"],
+                ["Linearização", "motor série, 14.7.3"], ["Espaço de estados (11)", "Eq. 14.57 a 14.60"],
+                ["1ª ordem (2.4)", "conversor K<sub>r</sub>/(1 + sτ<sub>r</sub>); filtro do tacogerador; malha de corrente fechada"],
+                ["2ª ordem (2.4)", "motor (τ<sub>a</sub>, τ<sub>m</sub>); malha de corrente com ζ = 0,707"],
+                ["Ordem superior e efeito do zero (2.4)", "malha de velocidade de 3ª ordem: 43,4% → 8,1%"],
+                ["Tipo e erro (4)", "motor tipo 0 ⇒ erro com P; o PI zera o erro"],
+                ["Alocação de zeros (7.6)", "τ<sub>c</sub> = τ<sub>2</sub>; τ<sub>s</sub> = 4τ<sub>e</sub>; rede polo-zero na referência"],
+                ["Bode e banda (10)", "ótimo simétrico (\"ampliar a largura de banda\"); cantos em 1/(4τ<sub>e</sub>) e 1/τ<sub>e</sub>"],
+                ["Controle digital (12)", "acionamento com microcontrolador, 14.7.11"]], [6.6, 9.8])
+    S += [Paragraph("9.11 Questões de revisão do capítulo 14 ligadas a controle", h2)]
+    S += B(["<b>14.8 O que é regulação de velocidade?</b> (velocidade a vazio − velocidade a plena carga)/velocidade a plena carga. Mede a sensibilidade da velocidade ao torque de carga (10,55% em malha aberta no Ex. 14.13).",
+            "<b>14.24 Qual é o princípio do controle em malha fechada?</b> Medir a velocidade, comparar com a referência e usar o erro para variar o ângulo de disparo ou o ciclo de trabalho, ajustando V<sub>a</sub> até o torque desenvolvido igualar o de carga.",
+            "<b>14.25 Vantagens da malha fechada?</b> Maior precisão, resposta dinâmica rápida e menor efeito de perturbações de carga e de não linearidades.",
+            "<b>14.26 e 14.27 PLL?</b> Comparar a fase dos pulsos do encoder com a referência digital. Dá regulação de velocidade muito fina e imune a desvios analógicos."])
+    S += [P("<i>As questões da prova de Acionamentos que você mandou em outro chat não estão acessíveis daqui. Se reenviar, elas entram nesta parte.</i>")]
     S.append(CondPageBreak(25 * cm))
     
     
     # ================= 10 Nyquist =================
-    S += [H1("10. Resposta em frequência e critério de Nyquist", "nyq"),
+    S += [H1("10. Resposta em frequência: Bode e Nyquist", "nyq"),
           P("Outra forma de olhar o mesmo sistema: aplica-se uma senoide de frequência ω e mede-se quanto ela sai amplificada (|G(jω)|) e atrasada (∠G(jω)). "
             "O <b>Bode</b> desenha módulo (dB) e fase contra log ω. O <b>diagrama de Nyquist</b> desenha G(jω)H(jω) no plano complexo, com ω indo de −∞ a +∞."),
-          Paragraph("10.1 O critério de Nyquist", h2),
+          H2k("10.1 Diagrama de Bode: o que é, o que representa fisicamente e como interpretar", "bode"),
+          P("<b>O que é:</b> dois gráficos em função da frequência ω (em escala logarítmica). O de cima é o <b>módulo</b> |G(jω)| em decibéis (20·log<sub>10</sub>|G|). O de baixo é a <b>fase</b> ∠G(jω) em graus. "
+            "Obtém-se trocando s por jω na função de transferência."),
+          P("<b>O que representa fisicamente:</b> aplique na entrada uma senoide de frequência ω (por exemplo, faça a tensão da armadura oscilar 1 V em torno do ponto de operação). "
+            "Depois do transitório, a saída (a velocidade) também oscila na <b>mesma frequência</b>, mas <b>multiplicada por |G(jω)|</b> e <b>atrasada</b> de ∠G(jω). "
+            "O Bode é a tabela completa dessa experiência para todas as frequências. Por isso dá para levantá-lo <b>medindo</b>, sem conhecer o modelo."),
+          fig("bode_fisico", 15.5, "Figura 0 – Motor do Rashid (Ex. 14.14) excitado com senoides: devagar, a velocidade acompanha; rápido demais, mal se mexe e fica atrasada."),
+          fig("bode_motor", 13.5, "Figura 0 – Bode do mesmo motor. Cada polo dobra a curva para baixo (−20 dB/déc) e atrasa até 90°."),
+          Paragraph("Como interpretar (leitura do Bode)", h3)]
+    S += B(["<b>Patamar em baixa frequência = ganho estático</b> (o G(0) do regime permanente). No motor: 0,59 (rad/s)/V, ou −4,6 dB. Se o módulo sobe sem parar em baixa frequência (−20 dB/déc desde o início), há integrador: sistema tipo 1.",
+            "<b>Frequências de canto = polos e zeros.</b> Cada polo em −a dobra o módulo para baixo em ω = a (−20 dB/década) e leva a fase até −90°. Cada zero dobra para cima (+20 dB/déc, +90°). "
+            "No motor: canto em 5,64 rad/s (polo mecânico, τ<sub>1</sub> = 0,18 s) e em 92,8 rad/s (polo elétrico, τ<sub>2</sub> ≈ 0,01 s). Acima de 92,8 cai a −40 dB/déc.",
+            "<b>Largura de banda</b> (onde o módulo cai 3 dB abaixo do patamar): até que frequência o sistema consegue acompanhar. Banda maior significa resposta mais rápida (t<sub>r</sub> ≈ 2/banda).",
+            "<b>Atenuação em alta frequência = filtro.</b> O PWM do conversor CC-CC chaveia a vários kHz (mais de 10<super>4</super> rad/s). Nessa faixa o motor atenua mais de 100 dB: a velocidade não \"vê\" o chaveamento, só o valor médio. "
+            "É por isso que o Rashid pode tratar o conversor como um ganho K<sub>r</sub>.",
+            "<b>Pico de ressonância:</b> aparece com polos complexos de ζ &lt; 0,707. Fisicamente, é uma frequência em que a máquina vibra muito (ex.: eixo com acoplamento elástico).",
+            "<b>Fase e estabilidade:</b> quanto mais atraso de fase onde |GH| = 1 (0 dB), mais perto da instabilidade. Isso dá as <b>margens de ganho e de fase</b> (10.3)."])
+    S += P("<b>Esboço assintótico (à mão):</b> (1) escreva G na forma K·(1 + s/z)…/[(1 + s/p)…]; (2) trace o patamar 20·log K até o primeiro canto; (3) a cada polo, inclinação −20 dB/déc a mais; a cada zero, +20; "
+           "(4) na fase, cada polo vale −45° no canto e −90° uma década depois; cada zero, +45° e +90°."),
+    S += [Paragraph("10.2 O critério de Nyquist", h2),
           eq(r"Z=N+P"),
           P("<b>P</b> = polos de malha <b>aberta</b> no semiplano direito (você sabe pela FTMA). <b>N</b> = número de voltas, no sentido horário, que a curva de Nyquist dá em torno do ponto <b>−1</b>. "
             "<b>Z</b> = polos de malha <b>fechada</b> no semiplano direito. Estável ⇔ Z = 0. Se a malha aberta é estável (P = 0), basta a curva <b>não envolver o −1</b>."),
-          P("<b>Por que o −1?</b> Os polos de MF satisfazem 1 + GH = 0, ou seja, GH = −1. O −1 é a mesma condição de módulo 1 e ângulo 180° do LGR. "
+          P("<b>Por que o −1?</b> Os polos de malha fechada satisfazem 1 + GH = 0, ou seja, GH = −1. O −1 é a mesma condição de módulo 1 e ângulo 180° do LGR. "
             "Se em alguma frequência o sinal volta com ganho ≥ 1 e invertido (180°), a realimentação \"negativa\" vira positiva e a oscilação se sustenta ou cresce."),
           fig("nyquist", 15, "Figura 0 – Nyquist de K/[(s+1)(s+2)(s+3)]: cruza o eixo real em −K/60 (ω = √11). Instável para K &gt; 60, o mesmo resultado do Routh do Exercício 13.3."),
-          Paragraph("10.2 Margens de ganho e de fase (estabilidade relativa)", h2),
-          P("<b>Margem de ganho (MG):</b> quanto o ganho pode ser multiplicado até instabilizar, medida na frequência em que a fase vale −180°. <b>Margem de fase (MF):</b> quanto atraso extra de fase cabe, medido onde |GH| = 1 (0 dB). "
-            "Para K = 30 no exemplo: MG = 60/30 = 2 (6 dB) e MF ≈ 25°. Regra prática de projeto: MF de 45° a 60° e MG &gt; 6 dB. A MF se relaciona com o amortecimento: ζ ≈ MF/100 para MF &lt; 70°."),
+          Paragraph("10.3 Margens de ganho e de fase (estabilidade relativa)", h2),
+          P("<b>Margem de ganho:</b> quanto o ganho pode ser multiplicado até instabilizar, medida na frequência em que a fase vale −180°. <b>Margem de fase:</b> quanto atraso extra de fase cabe, medido onde |GH| = 1 (0 dB). "
+            "Para K = 30 no exemplo: margem de ganho = 60/30 = 2 (6 dB) e margem de fase ≈ 25°. Regra prática de projeto: margem de fase de 45° a 60° e margem de ganho &gt; 6 dB. A margem de fase se relaciona com o amortecimento: ζ ≈ (margem de fase)/100 para margens abaixo de 70°."),
           fig("bode_margens", 11),
           ]
     S += dica("Nyquist e LGR contam a mesma história: o K em que o Nyquist passa por −1 é o K em que o LGR cruza o eixo jω, e a frequência é a mesma. "
@@ -922,7 +1131,7 @@ def story():
     S += exemplo("Exemplo – levar a massa-mola para polos em −4 ± j3",
                  P("Desejado: (s + 4)² + 9 = s² + 8s + 25. Com K = [k<sub>1</sub> k<sub>2</sub>]: A − BK = [[0, 1], [−2 − k<sub>1</sub>, −2 − k<sub>2</sub>]] ⇒ det = s² + (2 + k<sub>2</sub>)s + (2 + k<sub>1</sub>)."),
                  P("Igualando: 2 + k<sub>2</sub> = 8 ⇒ <b>k<sub>2</sub> = 6</b>; 2 + k<sub>1</sub> = 25 ⇒ <b>k<sub>1</sub> = 23</b>. Controlabilidade: [B AB] = [[0, 1], [1, −2]] tem posto 2 ✓."),
-                 P("Ganho de referência: o ganho estático de MF é C(−(A−BK))<super>−1</super>B·N = N/25 ⇒ <b>N = 25</b> para seguir r sem erro. "
+                 P("Ganho de referência: o ganho estático de malha fechada é C(−(A−BK))<super>−1</super>B·N = N/25 ⇒ <b>N = 25</b> para seguir r sem erro. "
                    "O resultado é ζ = 0,8, ω<sub>n</sub> = 5, sem sobressinal visível e t<sub>s</sub> ≈ 1 s, contra 4 s do sistema solto."),
                  fig("ss_resp", 12))
     S += B(["<b>Observador (estimador de estados):</b> quando nem todos os estados são medidos, estima-se x com x̂' = Ax̂ + Bu + L(y − Cx̂). Os polos de A − LC devem ser 2 a 5 vezes mais rápidos que os do controle. "
@@ -966,7 +1175,7 @@ def story():
             "u[k] = K<sub>p</sub>e[k] + K<sub>i</sub>I[k] + K<sub>d</sub>D[k]. Depois sature u (ex.: PWM entre 0 e 255) e congele o integrador quando saturar (anti-windup)."),
           P("<font face='DejaVuSansMono'>e = r - y;  I += T*e;  D = (e - e_ant)/T;  u = Kp*e + Ki*I + Kd*D;  u = constrain(u, 0, 255);  e_ant = e;  analogWrite(pino, u);</font>"),
           ]
-    S += dica("Transformada Z em prova: (1) discretize com ZOH; (2) monte 1 + KG(z) = 0; (3) estável se |z| &lt; 1; (4) valor final: y(∞) = lim<sub>z→1</sub>(z − 1)Y(z). "
+    S += dica("Transformada Z em prova: (1) discretize com segurador de ordem zero; (2) monte 1 + KG(z) = 0; (3) estável se |z| &lt; 1; (4) valor final: y(∞) = lim<sub>z→1</sub>(z − 1)Y(z). "
               "Polo em z = 1 é o integrador digital (tipo 1).")
     S.append(CondPageBreak(25 * cm))
     
@@ -979,12 +1188,12 @@ def story():
         return out
     S += ex("13.1 – Função de transferência e polos",
             "Um sistema é descrito por y'' + 4y' + 3y = 2u. Ache a FT, os polos, diga se é estável e qual o valor final ao degrau unitário.",
-            P("Laplace com CI nulas: (s<super>2</super>+4s+3)Y = 2U ⇒ G(s) = 2/(s<super>2</super>+4s+3) = 2/[(s+1)(s+3)]."),
+            P("Aplicando Laplace com condições iniciais nulas (sistema parado no instante zero): (s<super>2</super>+4s+3)Y = 2U ⇒ G(s) = 2/(s<super>2</super>+4s+3) = 2/[(s+1)(s+3)]."),
             P("Polos: −1 e −3, ambos reais negativos ⇒ <b>estável e sem oscilação</b> (superamortecido: ω<sub>n</sub> = √3 = 1,732; 2ζω<sub>n</sub> = 4 ⇒ ζ = 1,155 > 1)."),
             P("Valor final ao degrau: y(∞) = lim s·G(s)·(1/s) = G(0) = 2/3. O polo em −1 domina: t<sub>s</sub> ≈ 4 s."))
     S += ex("13.2 – Tipo e erros",
             "Para realimentação unitária com G(s) = 10(s+2)/[s(s+5)], classifique o tipo e calcule o erro ao degrau, à rampa e à parábola.",
-            P("Um s na origem ⇒ <b>tipo 1</b>. (A MF é estável: s<super>2</super> + 15s + 20 = 0 tem raízes negativas.)"),
+            P("Um s na origem ⇒ <b>tipo 1</b>. (A malha fechada é estável: s<super>2</super> + 15s + 20 = 0 tem raízes negativas.)"),
             P("K<sub>p</sub> = ∞ ⇒ e<sub>degrau</sub> = 0. K<sub>v</sub> = lim s·G = 10·2/5 = 4 ⇒ e<sub>rampa</sub> = 1/4 = 0,25. K<sub>a</sub> = 0 ⇒ e<sub>parábola</sub> = ∞."))
     S += ex("13.3 – K máximo por Routh",
             "Para G(s) = K/[(s+1)(s+2)(s+3)] com realimentação unitária, ache a faixa de K para estabilidade e a frequência de oscilação no limite.",
@@ -996,9 +1205,9 @@ def story():
             P("LGR: polos em 0 e −4. Saída do eixo em −2, e depois uma reta vertical em σ = −2. A reta ζ = 0,707 (45°) cruza a vertical em s<sub>d</sub> = −2 + j2."),
             P("Módulo: K = |s<sub>d</sub>|·|s<sub>d</sub>+4| = √8·√8 = <b>8</b>. Conferindo: s<super>2</super> + 4s + 8 = 0 ⇒ s = −2 ± j2 ✓. t<sub>s</sub>(2%) = 4/2 = <b>2 s</b>; M<sub>p</sub> ≈ 4,3%."))
     S += ex("13.5 – Erro ao degrau em sistema tipo 0",
-            "G(s) = K/[(s+1)(s+3)]. Qual K dá erro ao degrau de 0,2? A MF fica estável?",
+            "G(s) = K/[(s+1)(s+3)]. Qual K dá erro ao degrau de 0,2? A malha fechada fica estável?",
             P("Tipo 0: K<sub>p</sub> = G(0) = K/3. e = 1/(1 + K/3) = 0,2 ⇒ 1 + K/3 = 5 ⇒ <b>K = 12</b>."),
-            P("MF: s<super>2</super> + 4s + 3 + 12 = s<super>2</super> + 4s + 15 = 0 ⇒ s = −2 ± j3,317 ⇒ estável, ω<sub>n</sub> = 3,87, ζ = 0,516."))
+            P("Malha fechada: s<super>2</super> + 4s + 3 + 12 = s<super>2</super> + 4s + 15 = 0 ⇒ s = −2 ± j3,317 ⇒ estável, ω<sub>n</sub> = 3,87, ζ = 0,516."))
     S += ex("13.6 – LGR com zero",
             "Esboce o LGR de G(s) = K(s+3)/[s(s+1)] e ache os pontos de saída e de chegada no eixo real.",
             P("Polos 0 e −1, zero −3. Eixo real: [−1, 0] e (−∞, −3]. n − m = 1 ⇒ uma assíntota a 180°."),
@@ -1057,20 +1266,20 @@ def story():
     S += ex("13.13 – P e depois PID para 1/[(s+1)(s+3)(s+5)]",
             "(a) Controlador P com ζ = 0,2. (b) PID (avanço-atraso) para ficar 3,5× mais rápido, com overshoot 2× menor, erro nulo e deslocamento de −2° no polo dominante.",
             P("<b>(a)</b> Na reta ζ = 0,2, a condição de ângulo dá s<sub>d</sub> = −0,702 + j3,44 (85,1° + 56,3° + 38,7° = 180,1° ✓). "
-              "K = 3,45·4,14·5,51 = <b>78,7</b> ✓. Então t<sub>s</sub> = 4/0,702 = 5,70 s, OS = 52,6%, e o erro ao degrau é 1/(1 + 78,7/15) = 16% (tipo 0)."),
-            P("<b>(b)</b> t<sub>s</sub>' = 5,698/3,5 = 1,628 s ⇒ σ' = 4/1,628 = 2,457. OS' = 26,3% ⇒ ζ' = 0,391 ⇒ ω<sub>d</sub>' = 5,78 ⇒ <b>s<sub>d</sub>' = −2,457 + j5,78</b> ✓."),
+              "K = 3,45·4,14·5,51 = <b>78,7</b> ✓. Então t<sub>s</sub> = 4/0,702 = 5,70 s, sobressinal = 52,6%, e o erro ao degrau é 1/(1 + 78,7/15) = 16% (tipo 0)."),
+            P("<b>(b)</b> t<sub>s</sub>' = 5,698/3,5 = 1,628 s ⇒ σ' = 4/1,628 = 2,457. sobressinal' = 26,3% ⇒ ζ' = 0,391 ⇒ ω<sub>d</sub>' = 5,78 ⇒ <b>s<sub>d</sub>' = −2,457 + j5,78</b> ✓."),
             P("Ângulo da planta em s<sub>d</sub>': −255,0° ⇒ faltam <b>75,0°</b>. Como o PI vai \"roubar\" 2°, o PD precisa dar 77,0°: tan 77,0° = 5,78/(z − 2,457) ⇒ <b>z<sub>PD</sub> = 3,79</b>."),
             P("PI: o zero z<sub>PI</sub> e o polo na origem devem somar −2° em s<sub>d</sub>' ⇒ <b>z<sub>PI</sub> = 0,235</b>. Módulo ⇒ <b>K = 37,4</b>:"),
             eq(r"C(s)=37{,}4\,\frac{(s+3{,}79)(s+0{,}235)}{s}\ \Rightarrow\ K_d=37{,}4,\ K_p=150,\ K_i=33{,}2", 13),
-            P("Polos de MF: −2,457 ± j5,78 ✓, −3,87 e −0,218. Este último fica colado no zero −0,235 e deixa uma cauda lenta: a saída chega a ~98,7% rápido e só então vai a 100%. O OS simulado é ~19% (abaixo de 26,3% ✓)."),
+            P("Polos de malha fechada: −2,457 ± j5,78 ✓, −3,87 e −0,218. Este último fica colado no zero −0,235 e deixa uma cauda lenta: a saída chega a ~98,7% rápido e só então vai a 100%. O sobressinal simulado é ~19% (abaixo de 26,3% ✓)."),
             fig("ex_pid_E", 12))
     S += ex("13.14 – Avanço de fase: 200/[(s+10)(s+30)] duas vezes mais rápido",
             "A malha fechada atual tem polos em −20 ± j10. Projete um avanço para ficar 2× mais rápido mantendo o overshoot.",
-            P("MF: s<super>2</super> + 40s + 300 + 200 = s<super>2</super> + 40s + 500 ⇒ −20 ± j10. Mesmo ζ (mesmo ângulo) e 2× mais rápido ⇒ <b>s<sub>d</sub> = −40 ± j20</b>."),
+            P("Malha fechada: s<super>2</super> + 40s + 300 + 200 = s<super>2</super> + 40s + 500 ⇒ −20 ± j10. Mesmo ζ (mesmo ângulo) e 2× mais rápido ⇒ <b>s<sub>d</sub> = −40 ± j20</b>."),
             P("Ângulos em s<sub>d</sub>: polo −10 → 180° − arctan(20/30) = 146,31°; polo −30 → 180° − arctan(20/10) = 116,57°. Soma 262,88° ⇒ deficiência <b>82,88°</b>."),
             P("Zero <b>sobre o polo −10</b> (cancela): contribui 146,31°. O polo precisa contribuir 146,31 − 82,88 = 63,43° ⇒ tan 63,43° = 2 = 20/(p − 40) ⇒ <b>p = 50</b> ✓."),
             P("Ganho: |s<sub>d</sub> + 30| = |s<sub>d</sub> + 50| = 22,36 ⇒ 200K<sub>c</sub> = 22,36² = 500 ⇒ <b>K<sub>c</sub> = 2,5</b>. C(s) = 2,5(s+10)/(s+50). "
-              "MF: s<super>2</super> + 80s + 2000 ⇒ −40 ± j20 ✓."),
+              "Malha fechada: s<super>2</super> + 80s + 2000 ⇒ −40 ± j20 ✓."),
             P("Efeito colateral: K<sub>p</sub> caiu de 200/300 = 0,67 para 500/1500 = 0,33 e o erro ao degrau subiu de 60% para 75%. "
               "O avanço resolve o transitório, não o erro. Para o erro seria preciso adicionar atraso ou PI."))
     S += ex("13.15 – PID para K/(s²+5s+4) com ζ = 0,8 e t<sub>p</sub> = 1,047 s",
@@ -1104,9 +1313,9 @@ def story():
         "(a) σ<sub>a</sub> = −7/3 = −2,33; ±60° e 180°. (b) 3s<super>2</super>+14s+10 = 0 ⇒ s = −0,880. (c) Routh em s<super>3</super>+7s<super>2</super>+10s+K: K = 70, ω = √10 = 3,16 rad/s.",
         "ω<sub>n</sub> = √5 = 2,236; ζ = 1/√5 = 0,447; M<sub>p</sub> ≈ 20,8%; t<sub>s</sub> = 4/1 = 4 s.",
         "s<sub>d</sub> = −1 + j1,732; ∠G(s<sub>d</sub>) = −(120°+90°) = −210° ⇒ falta 30°. Zero em −1 (cancela) e polo em −2; K<sub>c</sub> = |s<sub>d</sub>||s<sub>d</sub>+2| = 2·2 = 4 ⇒ G<sub>c</sub> = 4(s+1)/(s+2).",
-        "Routh dá estabilidade só para K < 6; com K = 10 a MF é instável e o teorema do valor final nem vale. Daí a necessidade do atraso.",
+        "Routh dá estabilidade só para K < 6; com K = 10 a malha fechada é instável e o teorema do valor final nem vale. Daí a necessidade do atraso.",
         "β ≈ 10 (K<sub>v</sub> original = 0,53): por exemplo G<sub>c</sub> = K<sub>c</sub>(s+0,05)/(s+0,005), com K<sub>c</sub> ≈ 0,9–1, reajustado pela condição de módulo no polo dominante (≈ −0,31 ± j0,55). Erro à rampa ≈ 0,2.",
-        "O integrador soma um polo na origem: o tipo sobe de 0 para 1 e o erro ao degrau vai a zero (desde que a MF continue estável)."]
+        "O integrador soma um polo na origem: o tipo sobe de 0 para 1 e o erro ao degrau vai a zero (desde que a malha fechada continue estável)."]
     for i, t in enumerate(gab, 1):
         S.append(Paragraph(t, ParagraphStyle("gb", parent=body, leftIndent=20, fontSize=10, leading=13.5), bulletText=f"P{i}."))
     S.append(CondPageBreak(25 * cm))
@@ -1134,7 +1343,7 @@ def story():
     S += [Paragraph("Comandos do MATLAB usados em aula", h2)]
     S += table([["Comando", "O que faz"],
                 ["P=[1]; Q=[1 3 2 0];", "numerador e denominador da FTMA (coeficientes em potências decrescentes de s)"],
-                ["roots([1 3 2 1])", "raízes da equação característica (polos de MF)"],
+                ["roots([1 3 2 1])", "raízes da equação característica (polos de malha fechada)"],
                 ["rlocus(P,Q)", "desenha o LGR"],
                 ["[K,p]=rlocfind(P,Q)", "clique no LGR: devolve K e os polos naquele ponto"],
                 ["step(P,Q)", "resposta ao degrau"],
