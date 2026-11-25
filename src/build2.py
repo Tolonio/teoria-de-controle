@@ -241,6 +241,10 @@ def story():
                 ["G<sub>a</sub>(s) atuador", "o músculo", "servomotores (torque)", "relé que liga a resistência"],
                 ["G<sub>p</sub>(s) planta", "a coisa física", "braço com massa, inércia e gravidade", "volume de ar esquentando"],
                 ["Y(s) saída", "o que acontece", "posição real da garra", "temperatura real"]], [3.4, 2.6, 5.0, 5.4])
+    S += [P("<b>O que é o R − H·Y da coluna do erro?</b> É a fórmula do erro: <b>E = R − H·Y</b>, ou seja, referência menos a leitura do sensor. Y é a saída real; H é o sensor, que entrega Y multiplicado pelo seu ganho (o ponto é multiplicação). "
+            "Então <b>H·Y é o que o controlador enxerga</b>, e o sinal de menos é o que torna a realimentação negativa (A.5). "
+            "Se o sensor lê a grandeza direto (termômetro), H = 1 e E = R − Y = 25 − 20 = 5 °C. Se converte unidade, H aparece: no motor do Rashid (cap. 9) o sensor dá 0,095 V por rad/s, "
+            "então a 100 rad/s ele entrega H·Y = 9,5 V e o erro é E = V<sub>r</sub> − 9,5 V, com a referência também em volts.")]
     S += [P("Cada bloco multiplica o que entra nele. Juntando, chega-se à <b>função de transferência de malha fechada</b>, deduzida com calma no capítulo 1:"),
           eq(r"U=G_aG_c\,E,\quad Y=G_p\,U\ \Rightarrow\ \frac{Y}{E}=G_cG_aG_p=G(s);\qquad E=R-HY\ \Rightarrow\ \frac{Y}{R}=\frac{G}{1+GH}"),
           Paragraph("A.4 Exemplo real (Acionamentos, Rashid Ex. 14.13): o motor com carga", h2),
